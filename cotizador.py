@@ -27,6 +27,7 @@ def cotizador_optimo():
         tipo_vehiculo =  data['tipo_vehiculo']
         tasa_comision_apertura = data['tasa_comision_apertura']
         tasa_interes_anual = data['tasa_interes_anual']
+        num_parametros_facturacion = data['num_parametros_facturacion']
         tipo_respuesta = data['tipo_respuesta']
 
         # Validaciones básicas
@@ -44,9 +45,12 @@ def cotizador_optimo():
         config = json.loads(text.read())
         iva = config['fiscal']['IVA']/100
         isr = config['fiscal']['ISR']/100
+        max_valor_deducible = config['fiscal']['max_valor_deducible']
         precio_activo = config['Cotizacion_Config']['precio_activo']/100
         tasa_descuento = config['Cotizacion_Config']['tasa_descuento']/100
         deducibilidad = config['Cotizacion_Config']['deducibilidad']/100
+        disminucion_valor = config['Cotizacion_Config']['disminucion_valor']/100
+        tasa_credito = config['credito']['tasa_credito']/100
         tasa_enganche = config['credito']['tasa_enganche']/100
         cat_base_deducible = config['catalogo_base_deducible']
         
@@ -113,53 +117,154 @@ def cotizador_optimo():
         else:
             complemento_renta = 0
         
-        #**** Seccion Tabla resumen ****
-        #[solo_leasing]
-        total_deducible_fiscal_leasing = renta_mensual_descuento*dedudibilidad*plazo_meses
-        devolucion_inversion_solo_leasing = monto_inversion
-        rendimiento = plazo_meses*descuento_mensual
-        monto_pagado = pago_inicial_total - rentas_deposito
-        total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado
-        ahorro_isr_esperado_solo_leasing = total_deducible_fiscal_leasing+isr
-        total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
-        devolucion_rentas_deposito = (rentas_deposito if monto_inversion == 0 else 0)
-        beneficio_solo_leasing = ahorro_isr_esperado_solo_leasing + total_iva_acreditable_leasing + devolucion_rentas_deposito
-        costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
         
-        #[leasing_compra]
-        
-        
-        
-        # Generar tabla de amortización
-        tabla_amortizacion = []
-        saldo_pendiente = monto_arrendamiento_siva
+        if (tipo_respuesta == 2 or tipo_respuesta == 4 ):
+            #**** Seccion Tabla resumen ****
+            #[solo_leasing]
+            total_deducible_fiscal_leasing = renta_mensual_descuento*deducibilidad*plazo_meses
+            devolucion_inversion_solo_leasing = monto_inversion
+            rendimiento = plazo_meses*descuento_mensual
+            monto_pagado_leasing = pago_inicial_total - rentas_deposito
+            total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado_leasing
+            ahorro_isr_esperado_leasing = total_deducible_fiscal_leasing*isr
+            total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
+            devolucion_rentas_deposito = (rentas_deposito if monto_inversion == 0 else 0)
+            beneficio_solo_leasing = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing + devolucion_rentas_deposito
+            costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
+            
+            #[leasing_compra]
+            valor_comercial_esperado = valor_factura*(1-(disminucion_valor/12))**plazo_meses
+            total_pagado_plan_leasing_compra = total_pagado_plan_solo_leasing + valor_residual
+            total_iva_acreditable_leasing_compra = total_iva_acreditable_leasing + iva_residual
+            ahorro_compra = valor_comercial_esperado - valor_residual
+            beneficio_leasing_compra = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing_compra + ahorro_compra + devolucion_rentas_deposito
+            costo_neto_leasing_compra = total_pagado_plan_leasing_compra - beneficio_leasing_compra
+            
+            #[Credito]
+            monto_pagado_credito = enganche
+            pago_credito = nf.pmt(((tasa_credito*(1+iva))/12),plazo_meses,-(valor_siva - enganche_siva),0)
+            tmp_intereses_credito = 0
+            for n in range(plazo_meses):
+                tmp_intereses_credito += -nf.ipmt(((tasa_credito*(1+iva))/12),(n+1),plazo_meses,(valor_siva - enganche_siva))
+            total_intereses_credito = tmp_intereses_credito/(1+iva)
+            total_pagado_plan_credito = monto_pagado_credito + (pago_credito * plazo_meses)
+            total_deducible_fiscal_credito = (max_valor_deducible if total_pagado_plan_credito>max_valor_deducible else total_pagado_plan_credito)
+            ahorro_isr_esperado_credito = total_deducible_fiscal_credito*isr
+            total_iva_acreditable_credito = (total_deducible_fiscal_credito*iva) + (total_intereses_credito*iva)
+            beneficio_credito = ahorro_isr_esperado_credito + total_iva_acreditable_credito
+            costo_neto_credito = total_pagado_plan_credito - beneficio_credito
+            
+            tabla_resumen = {
+                "Total Deducible Fiscal": {
+                    "Solo Leasing": total_deducible_fiscal_leasing,
+                    "Leasing + compra": total_deducible_fiscal_leasing,
+                    "Credito": total_deducible_fiscal_credito,
+                    "Compra": total_deducible_fiscal_credito
+                    },
+                "Devolucion inversion":{
+                    "Solo Leasing": devolucion_inversion_solo_leasing,
+                    "Leasing + compra": devolucion_inversion_solo_leasing,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Rendimiento":{
+                    "Solo Leasing": rendimiento,
+                    "Leasing + compra": rendimiento,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Valor Residual":{
+                    "Solo Leasing": residual_siva,
+                    "Leasing + compra": residual_siva,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Valor Comercial proyectado":{
+                    "Solo Leasing": 0,
+                    "Leasing + compra": valor_comercial_esperado,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Total Pagado Plan":{
+                    "Solo Leasing": total_pagado_plan_solo_leasing,
+                    "Leasing + compra": total_pagado_plan_leasing_compra,
+                    "Credito": total_pagado_plan_credito,
+                    "Compra": 0  
+                    },
+                "Ahorro ISR Esperado":{
+                    "Solo Leasing": ahorro_isr_esperado_leasing,
+                    "Leasing + compra": ahorro_isr_esperado_leasing,
+                    "Credito": ahorro_isr_esperado_credito,
+                    "Compra": 0  
+                    },
+                "Total IVA Acreditable":{
+                    "Solo Leasing": devolucion_inversion_solo_leasing,
+                    "Leasing + compra": devolucion_inversion_solo_leasing,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Ahorro Adquisicion":{
+                    "Solo Leasing": 0,
+                    "Leasing + compra": ahorro_compra,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Devolucion Rentas en Deposito":{
+                    "Solo Leasing": devolucion_rentas_deposito,
+                    "Leasing + compra": devolucion_rentas_deposito,
+                    "Credito": 0,
+                    "Compra": 0  
+                    },
+                "Beneficio total":{
+                    "Solo Leasing": beneficio_solo_leasing,
+                    "Leasing + compra": beneficio_leasing_compra,
+                    "Credito": beneficio_credito,
+                    "Compra": 0  
+                    },
+                "Costo neto":{
+                    "Solo Leasing": costo_neto_solo_leasing,
+                    "Leasing + compra": costo_neto_leasing_compra,
+                    "Credito": costo_neto_credito,
+                    "Compra": 0  
+                    }
+                }
 
-        for mes in range(1, plazo_meses + 1):
-            interes_pagado = saldo_pendiente * tasa_interes_mensual
-            capital_pagado = renta_mensual_calculada - interes_pagado
-            saldo_pendiente -= capital_pagado
-
-            # Asegurarse de que el último saldo no sea negativo debido a errores de punto flotante
-            if mes == plazo_meses:
-                capital_pagado += saldo_pendiente  # Ajustar para que el saldo sea 0 al final
-                saldo_pendiente = 0
-
-            tabla_amortizacion.append({
-                "mes": mes,
-                "renta_mensual_calculada": round(renta_mensual_calculada, 2),
-                "interes_pagado": round(interes_pagado, 2),
-                "capital_pagado": round(capital_pagado, 2),
-                "saldo_pendiente": round(max(residual_siva, saldo_pendiente), 2)  # Asegura que el saldo no sea negativo
-            })
+        elif (tipo_respuesta == 3 or tipo_respuesta == 4):
+            tabla_facturacion = {}
+            num_parametros_facturacion = num_parametros_facturacion
+        elif (tipo_respuesta == 1 or tipo_respuesta == 4):
+            # Generar tabla de amortización
+            tabla_amortizacion = []
+            saldo_pendiente = monto_arrendamiento_siva
+    
+            for mes in range(1, plazo_meses + 1):
+                interes_pagado = saldo_pendiente * tasa_interes_mensual
+                capital_pagado = renta_mensual_calculada - interes_pagado
+                saldo_pendiente -= capital_pagado
+    
+                # Asegurarse de que el último saldo no sea negativo debido a errores de punto flotante
+                if mes == plazo_meses:
+                    capital_pagado += saldo_pendiente  # Ajustar para que el saldo sea 0 al final
+                    saldo_pendiente = 0
+    
+                tabla_amortizacion.append({
+                    "mes": mes,
+                    "renta_mensual_calculada": round(renta_mensual_calculada, 2),
+                    "interes_pagado": round(interes_pagado, 2),
+                    "capital_pagado": round(capital_pagado, 2),
+                    "saldo_pendiente": round(max(residual_siva, saldo_pendiente), 2)  # Asegura que el saldo no sea negativo
+                })
 
         if tipo_respuesta == 1:
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
+                "renta_mensual_descuento": round(renta_mensual_descuento, 2),
                 "tabla_amortizacion": tabla_amortizacion
             }
         elif tipo_respuesta == 2:
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
+                "pago_credito_calculada": round(pago_credito, 2),
                 "tabla_resumen": tabla_resumen
             }
         elif tipo_respuesta == 3:
@@ -170,14 +275,16 @@ def cotizador_optimo():
         elif tipo_respuesta == 4:
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
-                "tabla_amortizacion": tabla_amortizacion
-                "tabla_resumen": tabla_resumen
+                "renta_mensual_descuento": round(renta_mensual_descuento, 2),
+                "pago_credito_calculada": round(pago_credito, 2),
+                "tabla_amortizacion": tabla_amortizacion,
+                "tabla_resumen": tabla_resumen,
                 "tabla_facturacion": tabla_facturacion
             }
         return jsonify(response)
 
     except KeyError as e:
-        return jsonify({"error": f"Falta una clave en el JSON de entrada: {e}. Asegúrate de incluir 'plazo_meses', 'monto_inicial' y 'tasa_interes_anual'."}), 400
+        return jsonify({"error": f"Falta una clave en el JSON de entrada: {e}. Asegurate de incluir 'plazo_meses', 'valor_factura' y 'tasa_interes_anual'."}), 400
     except Exception as e:
         return jsonify({"error": f"Ha ocurrido un error inesperado: {e}"}), 500
 
