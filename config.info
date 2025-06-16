@@ -1,0 +1,23 @@
+{"Cotizacion_Config": 
+{"precio_activo": 45, 
+"tasa_descuento": 10, 
+"disminucion_valor": 25, 
+"deducibilidad": 100, 
+"num_parametros_facturacion": 10
+}, 
+"credito": 
+{"tasa_credito": 28, 
+"tasa_enganche": 10
+}, 
+"fiscal": 
+{"IVA": 16, 
+"ISR": 30, 
+"depreciacion": 25, 
+"max_valor_deducible": 175000
+}, 
+"catalogo_base_deducible": 
+{"1": 8500, 
+"2": 8500, 
+"3": 6000
+}
+}
