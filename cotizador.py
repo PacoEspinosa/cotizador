@@ -103,7 +103,7 @@ def cotizador_optimo():
             renta_mensual_calculada = nf.pmt(tasa_interes_mensual,plazo_meses,-monto_arrendamiento_siva,residual_siva)
         iva_renta_mensual_calculada = renta_mensual_calculada*iva
         total_renta_mensual_calculada = renta_mensual_calculada+iva_renta_mensual_calculada
-        descuento_mensual = (0 if monto_inversion = 0 else monto_inversion*(tasa_descuento/12))
+        descuento_mensual = (0 if monto_inversion == 0 else monto_inversion*(tasa_descuento/12))
         renta_mensual_descuento = renta_mensual_calculada-descuento_mensual
         iva_renta_mensual_descuento = renta_mensual_descuento+iva
         total_renta_mensual_descuento = renta_mensual_descuento+iva_renta_mensual_descuento
@@ -122,7 +122,7 @@ def cotizador_optimo():
         total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado
         ahorro_isr_esperado_solo_leasing = total_deducible_fiscal_leasing+isr
         total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
-        devolucion_rentas_deposito = (rentas_deposito if monto_inversion = 0 else 0)
+        devolucion_rentas_deposito = (rentas_deposito if monto_inversion == 0 else 0)
         beneficio_solo_leasing = ahorro_isr_esperado_solo_leasing + total_iva_acreditable_leasing + devolucion_rentas_deposito
         costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
         
