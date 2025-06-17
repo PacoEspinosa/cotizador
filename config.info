@@ -16,8 +16,8 @@
 "max_valor_deducible": 175000
 }, 
 "catalogo_base_deducible": 
-{"1": 8500, 
-"2": 8500, 
-"3": 6000
+{"H": 8500, 
+"E": 8500, 
+"G": 6000
 }
 }
