@@ -20,6 +20,16 @@
 "E": 8500, 
 "G": 6000
 },
+"catalogo_tasa_comision": 
+{"min": 0, 
+"max": 4
+},
+"catalogo_otros_gastos": 
+{"12": 9800, 
+"24": 14100,
+"36": 18400, 
+"48": 22700
+},
 "catalogo_conceptos_factura": 
 {"g_administracion": {
 	"media": 0.2831,
