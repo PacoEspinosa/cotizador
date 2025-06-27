@@ -1,0 +1,17 @@
+{
+    "base_deducible": 8500,
+    "descuento_mensual": 0,
+    "renta_mensual_calculada": 65897.12,
+    "tabla_facturacion": {
+        "Alta_vehiculo": 3331.01,
+        "GPS": 5385.04,
+        "Gastos_administracion": 12789.54,
+        "Gastos_arrendamiento": 16039.75,
+        "Gastos_notariales": 2922.49,
+        "Gestoria_alta_vehiculo": 2485.4,
+        "Gestoria_seguro": 1508.38,
+        "Instalacion_GPS": 2839.64,
+        "Renta_leasing": 8497.14,
+        "Seguro_factura": 6873.42,
+        "Telemetria": 3225.31
+    }

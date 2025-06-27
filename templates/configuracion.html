@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Configuración</h1>
+    <form method="POST">
+        {% for key, value in config.items() %}
+            <div class="form-group">
+                <label for="{{ key }}">{{ key.replace('_', ' ').title() }}:</label>
+                {% if value is number %}
+                    <input type="number" step="any" id="{{ key }}" name="{{ key }}" value="{{ value }}" required>
+                {% else %}
+                    <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}" required>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="form-group">
+            <input type="submit" value="Guardar Configuración">
+        </div>
+    </form>
+{% endblock %}

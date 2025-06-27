@@ -1,0 +1,89 @@
+{
+    "renta_mensual_calculada": 65897.12,
+    "tabla_amortizacion": [
+        {
+            "capital_pagado": 45798.09,
+            "interes_pagado": 20099.03,
+            "mes": 1,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 624169.74
+        },
+        {
+            "capital_pagado": 47172.03,
+            "interes_pagado": 18725.09,
+            "mes": 2,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 576997.71
+        },
+        {
+            "capital_pagado": 48587.19,
+            "interes_pagado": 17309.93,
+            "mes": 3,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 528410.52
+        },
+        {
+            "capital_pagado": 50044.81,
+            "interes_pagado": 15852.32,
+            "mes": 4,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 478365.71
+        },
+        {
+            "capital_pagado": 51546.15,
+            "interes_pagado": 14350.97,
+            "mes": 5,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 426819.56
+        },
+        {
+            "capital_pagado": 53092.54,
+            "interes_pagado": 12804.59,
+            "mes": 6,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 373727.02
+        },
+        {
+            "capital_pagado": 54685.31,
+            "interes_pagado": 11211.81,
+            "mes": 7,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 319041.71
+        },
+        {
+            "capital_pagado": 56325.87,
+            "interes_pagado": 9571.25,
+            "mes": 8,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 262715.83
+        },
+        {
+            "capital_pagado": 58015.65,
+            "interes_pagado": 7881.47,
+            "mes": 9,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 204700.18
+        },
+        {
+            "capital_pagado": 59756.12,
+            "interes_pagado": 6141.01,
+            "mes": 10,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 144944.07
+        },
+        {
+            "capital_pagado": 61548.8,
+            "interes_pagado": 4348.32,
+            "mes": 11,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 83395.27
+        },
+        {
+            "capital_pagado": 83395.27,
+            "interes_pagado": 2501.86,
+            "mes": 12,
+            "renta_mensual_calculada": 65897.12,
+            "saldo_pendiente": 20000
+        }
+    ]
+}

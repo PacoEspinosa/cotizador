@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Cotizador</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="valor_factura">Valor Factura:</label>
+            <input type="number" step="0.01" id="valor_factura" name="valor_factura" value="758100" required>
+        </div>
+        <div class="form-group">
+            <label for="accesorios">Accesorios:</label>
+            <input type="number" step="0.01" id="accesorios" name="accesorios" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="plazo_meses">Plazo (meses):</label>
+            <input type="number" id="plazo_meses" name="plazo_meses" value="12" required>
+        </div>
+        <div class="form-group">
+            <label for="seguro">Seguro:</label>
+            <input type="number" step="0.01" id="seguro" name="seguro" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="pago_inicial_total">Pago Inicial Total:</label>
+            <input type="number" step="0.01" id="pago_inicial_total" name="pago_inicial_total" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="residual_siva">Residual S/IVA:</label>
+            <input type="number" step="0.01" id="residual_siva" name="residual_siva" value="20000" required>
+        </div>
+        <div class="form-group">
+            <label for="monto_inversion">Monto Inversión:</label>
+            <input type="number" step="0.01" id="monto_inversion" name="monto_inversion" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="deposito_garantia">Depósito Garantía:</label>
+            <input type="number" step="0.01" id="deposito_garantia" name="deposito_garantia" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="tipo_vehiculo">Tipo Vehículo (H, E, G):</label>
+            <input type="text" id="tipo_vehiculo" name="tipo_vehiculo" value="H" required>
+        </div>
+        <div class="form-group">
+            <label for="tasa_comision_apertura">Tasa Comisión Apertura:</label>
+            <input type="number" step="0.01" id="tasa_comision_apertura" name="tasa_comision_apertura" value="1" required>
+        </div>
+        <div class="form-group">
+            <label for="tasa_interes_anual">Tasa Interés Anual:</label>
+            <input type="number" step="0.01" id="tasa_interes_anual" name="tasa_interes_anual" value="36" required>
+        </div>
+        <div class="form-group">
+            <label for="num_parametros_facturacion">Número Parámetros Facturación:</label>
+            <input type="number" id="num_parametros_facturacion" name="num_parametros_facturacion" value="10" required>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Consultar API">
+        </div>
+    </form>
+
+    {% if api_response %}
+		<body>
+			<h1>Resultados del cotizador</h1>
+
+			<div class="tabs">
+				<button class="tablinks active" onclick="openTab(event, 'amortizacion')">Tabla de Amortización</button>
+				<button class="tablinks" onclick="openTab(event, 'resumen')">Tabla de Resumen</button>
+			</div>
+
+			<div id="amortizacion" class="tabcontent" style="display: block;">
+				<h2>Tabla de Amortización</h2>
+				{% if amortizacion %}
+					<p><strong>Renta Mensual Calculada:</strong> {{ "%.2f" | format(amortizacion.renta_mensual_calculada) }}</p>
+					<table>
+						<thead>
+							<tr>
+								<th>Mes</th>
+								<th>Renta Mensual Calculada</th>
+								<th>Interés Pagado</th>
+								<th>Capital Pagado</th>
+								<th>Saldo Pendiente</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for row in amortizacion.tabla_amortizacion %}
+							<tr>
+								<td>{{ row.mes }}</td>
+								<td>{{ "%.2f" | format(row.renta_mensual_calculada) }}</td>
+								<td>{{ "%.2f" | format(row.interes_pagado) }}</td>
+								<td>{{ "%.2f" | format(row.capital_pagado) }}</td>
+								<td>{{ "%.2f" | format(row.saldo_pendiente) }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<p>No hay datos disponibles para la Tabla de Amortización.</p>
+				{% endif %}
+			</div>
+
+			<div id="resumen" class="tabcontent">
+				<h2>Tabla de Resumen</h2>
+				{% if resumen %}
+					<p><strong>Pago Crédito Calculado:</strong> {{ "%.2f" | format(resumen.pago_credito_calculada) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "%.2f" | format(resumen.renta_mensual_calculada) }}</p>
+					<table>
+						<thead>
+							<tr>
+								<th>Concepto</th>
+								<th>Compra</th>
+								<th>Crédito</th>
+								<th>Leasing + Compra</th>
+								<th>Solo Leasing</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in resumen.tabla_resumen.items() %}
+							<tr>
+								<td><strong>{{ key }}</strong></td>
+								<td>{{ "%.2f" | format(value.Compra) }}</td>
+								<td>{{ "%.2f" | format(value.Credito) }}</td>
+								<td>{{ "%.2f" | format(value['Leasing + compra']) }}</td>
+								<td>{{ "%.2f" | format(value['Solo Leasing']) }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<p>No hay datos disponibles para la Tabla de Resumen.</p>
+				{% endif %}
+			</div>
+
+			<script>
+				function openTab(evt, tabName) {
+					var i, tabcontent, tablinks;
+
+					// Get all elements with class="tabcontent" and hide them
+					tabcontent = document.getElementsByClassName("tabcontent");
+					for (i = 0; i < tabcontent.length; i++) {
+						tabcontent[i].style.display = "none";
+					}
+
+					// Get all elements with class="tablinks" and remove the class "active"
+					tablinks = document.getElementsByClassName("tablinks");
+					for (i = 0; i < tablinks.length; i++) {
+						tablinks[i].className = tablinks[i].className.replace(" active", "");
+					}
+
+					// Show the current tab, and add an "active" class to the button that opened the tab
+					document.getElementById(tabName).style.display = "block";
+					evt.currentTarget.className += " active";
+				}
+
+				// Open the default tab on page load
+				document.addEventListener('DOMContentLoaded', (event) => {
+					document.querySelector('.tablinks.active').click();
+				});
+			</script>
+		</body>
+    {% elif error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+{% endblock %}
