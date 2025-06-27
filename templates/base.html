@@ -124,7 +124,69 @@
         th {
             background-color: #f2f2f2;
         }
-    </style>
+        .tabs {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .tabs button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+        .tabs button:hover {
+            background-color: #ddd;
+        }
+        .tabs button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            background-color: #fff;
+            border-radius: 0 0 8px 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .summary-details {
+            margin-bottom: 10px;
+        }
+        .summary-details strong {
+            display: inline-block;
+            width: 180px; /* Adjust as needed for alignment */
+        }
+        .sub-table {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .sub-table th {
+            background-color: #5bc0de; /* A different color for sub-table headers */
+        }
+		</style>
 </head>
 <body>
     <div class="sidebar">

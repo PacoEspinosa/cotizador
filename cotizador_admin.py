@@ -209,7 +209,7 @@ def cotizador():
             response = requests.post(API_URL, json=payload, headers=headers)
             response.raise_for_status() # Lanza un HTTPError si la respuesta fue un error
             api_response = response.json()
-            flash('Consulta a la API realizada exitosamente!', 'success')
+            #flash('Consulta a la API realizada exitosamente!', 'success')
         except requests.exceptions.RequestException as e:
             error_message = f"Error al conectar con la API: {e}"
             flash(error_message, 'error')
@@ -220,9 +220,9 @@ def cotizador():
             error_message = f"Ocurrió un error inesperado: {e}"
             flash(error_message, 'error')
 
-    return render_template('cotizador.html', error_message=error_message,
+    return render_template('cotizador.html', api_response = api_response, error_message=error_message,
                            amortizacion=(api_response['tabla_amortizacion'] if api_response else ""),
                            resumen=(api_response["tabla_resumen"] if api_response else ""))
 
 if __name__ == '__main__':
-    app.run(debug=True,)
+    app.run(debug=True,port=5001)

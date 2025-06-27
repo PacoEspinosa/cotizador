@@ -61,14 +61,16 @@
 			<h1>Resultados del cotizador</h1>
 
 			<div class="tabs">
-				<button class="tablinks active" onclick="openTab(event, 'amortizacion')">Tabla de Amortización</button>
-				<button class="tablinks" onclick="openTab(event, 'resumen')">Tabla de Resumen</button>
+				<button class="tablinks active" onclick="openTab(event, 'resumen')">Tabla de Resumen</button>
+				<button class="tablinks" onclick="openTab(event, 'amortizacion')">Tabla de Amortización</button>
+				<button class="tablinks" onclick="openTab(event, 'facturacion')">Tabla de Facturación</button>
+				<button class="tablinks" onclick="openTab(event, 'cotizacion')">Datos de Cotización</button>
 			</div>
 
 			<div id="amortizacion" class="tabcontent" style="display: block;">
 				<h2>Tabla de Amortización</h2>
 				{% if amortizacion %}
-					<p><strong>Renta Mensual Calculada:</strong> {{ "%.2f" | format(amortizacion.renta_mensual_calculada) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "%.2f" | format(api_response.renta_mensual_calculada) }}</p>
 					<table>
 						<thead>
 							<tr>
@@ -80,13 +82,13 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for row in amortizacion.tabla_amortizacion %}
+							{% for row in api_response.tabla_amortizacion %}
 							<tr>
 								<td>{{ row.mes }}</td>
-								<td>{{ "%.2f" | format(row.renta_mensual_calculada) }}</td>
-								<td>{{ "%.2f" | format(row.interes_pagado) }}</td>
-								<td>{{ "%.2f" | format(row.capital_pagado) }}</td>
-								<td>{{ "%.2f" | format(row.saldo_pendiente) }}</td>
+								<td>{{ "$%.2f" | format(row.renta_mensual_calculada) }}</td>
+								<td>{{ "$%.2f" | format(row.interes_pagado) }}</td>
+								<td>{{ "$%.2f" | format(row.capital_pagado) }}</td>
+								<td>{{ "$%.2f" | format(row.saldo_pendiente) }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -96,11 +98,63 @@
 				{% endif %}
 			</div>
 
+			<div id="facturacion" class="tabcontent">
+				<h2>Tabla de Facturación</h2>
+				{% if api_response.tabla_facturacion %}
+					<p><strong>Renta Mensual Calculada:</strong> {{ "$%.2f" | format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Descuento Mensual:</strong> {{ "$%.2f" | format(api_response.descuento_mensual) }}</p>
+					<table>
+						<thead>
+							<tr>
+								<th>Concepto</th>
+								<th>Valor</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in api_response.tabla_facturacion.items() %}
+							<tr>
+								<td><strong>{{ key.replace('_', ' ').title() }}</strong></td>
+								<td>{{ "$%.2f" | format(value) }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<p>No hay datos disponibles para la Tabla de Facturación.</p>
+				{% endif %}
+			</div>
+
+			<div id="cotizacion" class="tabcontent">
+				<h2>Datos de Cotización</h2>
+				{% if api_response.tabla_facturacion %}
+					<p><strong>Renta Mensual Calculada:</strong> {{ "$%.2f" | format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Descuento Mensual:</strong> {{ "$%.2f" | format(api_response.descuento_mensual) }}</p>
+					<table>
+						<thead>
+							<tr>
+								<th>Concepto</th>
+								<th>Valor</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in api_response.tabla_cotizacion.items() %}
+							<tr>
+								<td><strong>{{ key.replace('_', ' ').title() }}</strong></td>
+								<td>{{ "$%.2f" | format(value) }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<p>No hay datos disponibles para los datos de cotización.</p>
+				{% endif %}
+			</div>
+
 			<div id="resumen" class="tabcontent">
 				<h2>Tabla de Resumen</h2>
 				{% if resumen %}
-					<p><strong>Pago Crédito Calculado:</strong> {{ "%.2f" | format(resumen.pago_credito_calculada) }}</p>
-					<p><strong>Renta Mensual Calculada:</strong> {{ "%.2f" | format(resumen.renta_mensual_calculada) }}</p>
+					<p><strong>Pago Crédito Calculado:</strong> {{ "$%.2f" | format(api_response.pago_credito_calculada) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "$%.2f" | format(api_response.renta_mensual_calculada) }}</p>
 					<table>
 						<thead>
 							<tr>
@@ -112,13 +166,13 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for key, value in resumen.tabla_resumen.items() %}
+							{% for key, value in api_response.tabla_resumen.items() %}
 							<tr>
 								<td><strong>{{ key }}</strong></td>
-								<td>{{ "%.2f" | format(value.Compra) }}</td>
-								<td>{{ "%.2f" | format(value.Credito) }}</td>
-								<td>{{ "%.2f" | format(value['Leasing + compra']) }}</td>
-								<td>{{ "%.2f" | format(value['Solo Leasing']) }}</td>
+								<td>{{ "$%.2f" | format(value.Compra) }}</td>
+								<td>{{ "$%.2f" | format(value.Credito) }}</td>
+								<td>{{ "$%.2f" | format(value['Leasing + compra']) }}</td>
+								<td>{{ "$%.2f" | format(value['Solo Leasing']) }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
