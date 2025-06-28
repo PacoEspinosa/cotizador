@@ -3,16 +3,29 @@
 {% block content %}
     <h1>Configuración</h1>
     <form method="POST">
-        {% for key, value in config.items() %}
-            <div class="form-group">
-                <label for="{{ key }}">{{ key.replace('_', ' ').title() }}:</label>
-                {% if value is number %}
-                    <input type="number" step="any" id="{{ key }}" name="{{ key }}" value="{{ value }}" required>
-                {% else %}
-                    <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}" required>
-                {% endif %}
-            </div>
-        {% endfor %}
+		<table>
+			<thead>
+				<tr>
+					<th>Concepto</th>
+					<th>Valor</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for key, value in config.items() %}
+				<tr>
+					<td align="left"><label for="{{ key }}">{{ key.replace('_', ' ').title() }}:</label></td>
+					<td class="td_1">
+					{% if value is number %}
+						<input type="number" step="any" id="{{ key }}" name="{{ key }}" value="{{ value }}" required>
+					{% else %}
+						<input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}" required>
+					{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+
         <div class="form-group">
             <input type="submit" value="Guardar Configuración">
         </div>

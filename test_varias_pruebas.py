@@ -139,3 +139,11 @@ try:
 except requests.exceptions.RequestException as e:
     error_message = f"Error al conectar con la API: {e}"
     print(error_message, 'error')
+
+#*************************************
+renta_mensual = 12345.6789
+print(renta_mensual)
+formato_moneda = f"${renta_mensual:,.2f} MXN"
+print(formato_moneda)  # Output: $12,345.68 MXN
+
+print("$%.2f" | format(renta_mensual))

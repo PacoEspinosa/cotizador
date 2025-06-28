@@ -70,7 +70,7 @@
 			<div id="amortizacion" class="tabcontent" style="display: block;">
 				<h2>Tabla de Amortización</h2>
 				{% if amortizacion %}
-					<p><strong>Renta Mensual Calculada:</strong> {{ "%.2f" | format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
 					<table>
 						<thead>
 							<tr>
@@ -85,10 +85,10 @@
 							{% for row in api_response.tabla_amortizacion %}
 							<tr>
 								<td>{{ row.mes }}</td>
-								<td>{{ "$%.2f" | format(row.renta_mensual_calculada) }}</td>
-								<td>{{ "$%.2f" | format(row.interes_pagado) }}</td>
-								<td>{{ "$%.2f" | format(row.capital_pagado) }}</td>
-								<td>{{ "$%.2f" | format(row.saldo_pendiente) }}</td>
+								<td>{{ "${:,.2f}".format(row.renta_mensual_calculada) }}</td>
+								<td>{{ "${:,.2f}".format(row.interes_pagado) }}</td>
+								<td>{{ "${:,.2f}".format(row.capital_pagado) }}</td>
+								<td>{{ "${:,.2f}".format(row.saldo_pendiente) }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -101,8 +101,8 @@
 			<div id="facturacion" class="tabcontent">
 				<h2>Tabla de Facturación</h2>
 				{% if api_response.tabla_facturacion %}
-					<p><strong>Renta Mensual Calculada:</strong> {{ "$%.2f" | format(api_response.renta_mensual_calculada) }}</p>
-					<p><strong>Descuento Mensual:</strong> {{ "$%.2f" | format(api_response.descuento_mensual) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Descuento Mensual:</strong> {{ "${:,.2f}".format(api_response.descuento_mensual) }}</p>
 					<table>
 						<thead>
 							<tr>
@@ -114,7 +114,7 @@
 							{% for key, value in api_response.tabla_facturacion.items() %}
 							<tr>
 								<td><strong>{{ key.replace('_', ' ').title() }}</strong></td>
-								<td>{{ "$%.2f" | format(value) }}</td>
+								<td>{{ "${:,.2f}".format(value) }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -127,8 +127,8 @@
 			<div id="cotizacion" class="tabcontent">
 				<h2>Datos de Cotización</h2>
 				{% if api_response.tabla_facturacion %}
-					<p><strong>Renta Mensual Calculada:</strong> {{ "$%.2f" | format(api_response.renta_mensual_calculada) }}</p>
-					<p><strong>Descuento Mensual:</strong> {{ "$%.2f" | format(api_response.descuento_mensual) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Descuento Mensual:</strong> {{ "${:,.2f}".format(api_response.descuento_mensual) }}</p>
 					<table>
 						<thead>
 							<tr>
@@ -140,7 +140,7 @@
 							{% for key, value in api_response.tabla_cotizacion.items() %}
 							<tr>
 								<td><strong>{{ key.replace('_', ' ').title() }}</strong></td>
-								<td>{{ "$%.2f" | format(value) }}</td>
+								<td>{{ "${:,.2f}".format(value) }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -153,8 +153,8 @@
 			<div id="resumen" class="tabcontent">
 				<h2>Tabla de Resumen</h2>
 				{% if resumen %}
-					<p><strong>Pago Crédito Calculado:</strong> {{ "$%.2f" | format(api_response.pago_credito_calculada) }}</p>
-					<p><strong>Renta Mensual Calculada:</strong> {{ "$%.2f" | format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Pago Crédito Calculado:</strong> {{ "${:,.2f}".format(api_response.pago_credito_calculada) }}</p>
+					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
 					<table>
 						<thead>
 							<tr>
@@ -169,10 +169,10 @@
 							{% for key, value in api_response.tabla_resumen.items() %}
 							<tr>
 								<td><strong>{{ key }}</strong></td>
-								<td>{{ "$%.2f" | format(value.Compra) }}</td>
-								<td>{{ "$%.2f" | format(value.Credito) }}</td>
-								<td>{{ "$%.2f" | format(value['Leasing + compra']) }}</td>
-								<td>{{ "$%.2f" | format(value['Solo Leasing']) }}</td>
+								<td>{{ "${:,.2f}".format(value.Compra) }}</td>
+								<td>{{ "${:,.2f}".format(value.Credito) }}</td>
+								<td>{{ "${:,.2f}".format(value['Leasing + compra']) }}</td>
+								<td>{{ "${:,.2f}".format(value['Solo Leasing']) }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>

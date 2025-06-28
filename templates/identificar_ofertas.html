@@ -9,23 +9,23 @@
         </div>
         <div class="form-group">
             <label for="plazo">Plazo (meses):</label>
-            <input type="number" id="plazo" name="plazo" required>
+            <input type="number" id="plazo" value="{{ plazo }}" name="plazo" required>
         </div>
         <div class="form-group">
             <label for="enganche_c_iva">Enganche c/IVA:</label>
-            <input type="number" step="0.01" id="enganche_c_iva" name="enganche_c_iva" required>
+            <input type="number" step="0.01" id="enganche_c_iva" value="{{ enganche_c_iva }}" name="enganche_c_iva" required>
         </div>
         <div class="form-group">
             <label for="valor_residual_s_iva">Valor residual S/IVA:</label>
-            <input type="number" step="0.01" id="valor_residual_s_iva" name="valor_residual_s_iva" required>
+            <input type="number" step="0.01" id="valor_residual_s_iva" value="{{ valor_residual_s_iva }}" name="valor_residual_s_iva" required>
         </div>
         <div class="form-group">
             <label for="pago_mensual">Pago Mensual:</label>
-            <input type="number" step="0.01" id="pago_mensual" name="pago_mensual" required>
+            <input type="number" step="0.01" id="pago_mensual" value="{{ pago_mensual }}" name="pago_mensual" required>
         </div>
         <div class="form-group">
             <label for="comision_apertura">Comisión Apertura:</label>
-            <input type="number" step="0.01" id="comision_apertura" name="comision_apertura" required>
+            <input type="number" step="0.01" id="comision_apertura" value="{{ comision_apertura }}" name="comision_apertura" required>
         </div>
         <div class="form-group">
             <input type="checkbox" id="es_credito" name="es_credito">

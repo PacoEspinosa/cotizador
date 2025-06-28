@@ -123,6 +123,12 @@ def identificar_ofertas():
     Permite al usuario ingresar parámetros para calcular una tasa de interés.
     """
     tasa_interes = None
+    valor_factura = 0.0
+    plazo = 0
+    enganche_c_iva = 0.0
+    valor_residual_s_iva = 0.0
+    pago_mensual = 0.0
+    comision_apertura = 0.0
     if request.method == 'POST':
         try:
             valor_factura = float(request.form['valor_factura'])
@@ -161,7 +167,9 @@ def identificar_ofertas():
         except Exception as e:
             flash(f'Ocurrió un error al calcular la tasa de interés: {e}', 'error')
 
-    return render_template('identificar_ofertas.html', tasa_interes=tasa_interes)
+    return render_template('identificar_ofertas.html', tasa_interes=tasa_interes, valor_factura=valor_factura, plazo=plazo,
+                           enganche_c_iva=enganche_c_iva, pago_mensual=pago_mensual, comision_apertura=comision_apertura,
+                           valor_residual_s_iva=valor_residual_s_iva)
 
 
 @app.route('/cotizador', methods=['GET', 'POST'])
