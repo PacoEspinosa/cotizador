@@ -11,9 +11,11 @@ import numpy_financial as nf
 import random
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 @app.route('/cotizador_optimo', methods=['POST'])
 def cotizador_optimo():
+    admin_message = ''
     try:
         data = request.get_json()
 
@@ -23,26 +25,28 @@ def cotizador_optimo():
         seguro = data['seguro']
         pago_inicial_total = data['pago_inicial_total']
         residual_siva = data['residual_siva']
-        monto_inversion = data['monto_inversion']
-        deposito_garantia = data['deposito_garantia']
+        rentas_deposito = data['rentas_deposito']
+        fondo_reserva = data['fondo_reserva']
+        tipo_activo =  data['tipo_activo']
         tipo_vehiculo =  data['tipo_vehiculo']
         tasa_comision_apertura = data['tasa_comision_apertura']
         tasa_interes_anual = data['tasa_interes_anual']
         num_parametros_facturacion = data['num_parametros_facturacion']
         tipo_respuesta = data['tipo_respuesta']
+        fuente_consulta = data['fuente_consulta']
 
-        # Validaciones básicas
+        # [[[[[[[[[[[   Validaciones básicas   ]]]]]]]]]]]
         if not all(isinstance(arg, (int, float)) for arg in [valor_factura,accesorios,plazo_meses, seguro, pago_inicial_total,
-                                                             residual_siva,monto_inversion,deposito_garantia,tasa_comision_apertura,
+                                                             residual_siva,rentas_deposito,fondo_reserva,tasa_comision_apertura,
                                                              tasa_interes_anual,tipo_respuesta]):
             return jsonify({"error": "Todos los campos deben ser numeros."}), 400
         if plazo_meses <= 0 or valor_factura <= 0 or tasa_interes_anual <= 0 or tipo_respuesta <= 0:
             return jsonify({"error": "Plazo, monto inicial, tasa de interes anual y tipo respuesta deben ser mayores que cero."}), 400
         if tipo_respuesta <= 0 or tipo_respuesta > 6:
             return jsonify({"error": "Tipo_respuesta solo puede estar entre 1 y 6."}), 400
-        if monto_inversion > 0 and deposito_garantia > 0:
-            return jsonify({"error": "Solo debe proporcionar uno de los conceptos, monto_inversion o deposito_garantia."}), 400
-        if pago_inicial_total < (seguro + monto_inversion):
+        if rentas_deposito > 0 and fondo_reserva > 0:
+            return jsonify({"error": "Solo debe proporcionar uno de los conceptos, rentas_deposito o fondo_reserva."}), 400
+        if pago_inicial_total < (seguro + rentas_deposito):
             return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el monto en inversion."}), 400
 
         # constantes configuracion
@@ -61,10 +65,18 @@ def cotizador_optimo():
         cat_conceptos_factura = config['catalogo_conceptos_factura']
         tasa_comision_min = config['catalogo_tasa_comision']['min']
         tasa_comision_max = config['catalogo_tasa_comision']['max']
+        cat_tipo_activo = config['catalogo_tipo_activo']
         cat_otros_gastos = config['catalogo_otros_gastos']
+        cat_valor_residual = config['catalogo_valor_residual']
         
         if tasa_comision_apertura <= tasa_comision_min or tasa_comision_apertura > tasa_comision_max:
-            return jsonify({"error": "Comision de apertura solo puede estar entre 0 y 4."}), 400
+            if fuente_consulta == 0:
+                return jsonify({"error": "Comision de apertura solo puede estar entre 0 y 4."}), 400
+            else:
+                admin_message = "Comision de apertura solo puede estar entre 0 y 4."
+                
+        if tipo_activo not in cat_tipo_activo:
+            return jsonify({"error": "tipo_activo no contiene un valor permitido."}), 400
 
         # variables para calculo
         valor_siva = valor_factura/(1+iva)
@@ -75,26 +87,28 @@ def cotizador_optimo():
         iva_pago_inicial_total = pago_inicial_total*iva
         seguro_siva = seguro/(1+iva)
         iva_seguro =  seguro*iva
-        if monto_inversion == 0:
-            if deposito_garantia > 0:
-                rentas_deposito = deposito_garantia
+        if rentas_deposito == 0:
+            if fondo_reserva > 0:
+                rentas_deposito = fondo_reserva
             else:
                 if ((pago_inicial_total-seguro)/valor_siva) > precio_activo:
                     rentas_deposito = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
                 else:
                     rentas_deposito = 0
         else:
-            rentas_deposito = monto_inversion
+            rentas_deposito = rentas_deposito
         iva_residual = residual_siva*iva
         valor_residual = residual_siva + iva_residual
+        tasa_residual = round((residual_siva/valor_siva),2)*100
         if plazo_meses <= 12:
-            otros_gastos_siva = cat_otros_gastos['12']
+            bucket_meses = '12'
         elif plazo_meses <= 24:
-            otros_gastos_siva = cat_otros_gastos['24']
+            bucket_meses = '24'
         elif plazo_meses <= 36:
-            otros_gastos_siva = cat_otros_gastos['36']
+            bucket_meses = '36'
         else:
-            otros_gastos_siva = cat_otros_gastos['48']
+            bucket_meses = '48'
+        otros_gastos_siva = cat_otros_gastos[bucket_meses]
         iva_otros_gastos = otros_gastos_siva*iva
         otros_gastos = otros_gastos_siva + iva_otros_gastos
         valor_inicial_arrenda = pago_inicial_total - seguro - rentas_deposito
@@ -108,11 +122,26 @@ def cotizador_optimo():
         enganche_siva = enganche/(1+iva)
         iva_enganche = enganche_siva*iva
         
+        #[[[[[[[[[[[  Validaciones  ]]]]]]]]]]]
         if monto_arrendamiento<0:
-            return jsonify({"error": "Revisar valor_factura, pago_inicial, monto_inversion ó seguro, tienen algún valor erróneo."}), 400
+            return jsonify({"error": "Revisar valor_factura, pago_inicial, rentas_deposito ó seguro, tienen algún valor erróneo."}), 400
         if valor_inicial_arrenda < 0 or valor_inicial_arrenda > (valor_siva*precio_activo):
-            return jsonify({"error": "Revisar deposito_garantia, pago_inicial, monto_inversion ó seguro, tienen algún valor erróneo."}), 400
-        
+            return jsonify({"error": "Revisar fondo_reserva, pago_inicial, rentas_deposito ó seguro, tienen algún valor erróneo."}), 400
+        if fuente_consulta == 0:
+            if tipo_activo == 'Bicicleta':
+                if tasa_residual < cat_valor_residual[tipo_activo]["min"] or tasa_residual > cat_valor_residual[tipo_activo]["max"]:
+                    return jsonify({"error": "El valor del residual debe ser entre el " + str(cat_valor_residual[tipo_activo]["min"]) + "% y el " + str(cat_valor_residual[tipo_activo]["max"]) + "%"}), 400
+            else:
+                if tasa_residual < cat_valor_residual[bucket_meses]["min"] or tasa_residual > cat_valor_residual[bucket_meses]["max"]:
+                    return jsonify({"error": "El valor del residual debe ser entre el " + str(cat_valor_residual[bucket_meses]["min"]) + "% y el " + str(cat_valor_residual[bucket_meses]["max"]) + "%"}), 400
+        else:
+            if tipo_activo == 'Bicicleta':
+                if tasa_residual < cat_valor_residual[tipo_activo]["min"] or tasa_residual > cat_valor_residual[tipo_activo]["max"]:
+                    admin_message =  "El valor del residual debe ser entre el " + str(cat_valor_residual[tipo_activo]["min"]) + "% y el " + str(cat_valor_residual[tipo_activo]["max"]) + "%"
+            else:
+                if tasa_residual < cat_valor_residual[bucket_meses]["min"] or tasa_residual > cat_valor_residual[bucket_meses]["max"]:
+                    admin_message =  "El valor del residual debe ser entre el " + str(cat_valor_residual[bucket_meses]["min"]) + "% y el " + str(cat_valor_residual[bucket_meses]["max"]) + "%"
+            
         # Convertir tasa de interés anual a mensual
         tasa_interes_mensual = (tasa_interes_anual / 100) / 12
 
@@ -123,7 +152,7 @@ def cotizador_optimo():
             renta_mensual_calculada = nf.pmt(tasa_interes_mensual,plazo_meses,-monto_arrendamiento_siva,residual_siva)
         iva_renta_mensual_calculada = renta_mensual_calculada*iva
         total_renta_mensual_calculada = renta_mensual_calculada+iva_renta_mensual_calculada
-        descuento_mensual = (0 if monto_inversion == 0 else monto_inversion*(tasa_descuento/12))
+        descuento_mensual = (0 if rentas_deposito == 0 else rentas_deposito*(tasa_descuento/12))
         renta_mensual_descuento = renta_mensual_calculada-descuento_mensual
         iva_renta_mensual_descuento = renta_mensual_descuento*iva
         total_renta_mensual_descuento = renta_mensual_descuento+iva_renta_mensual_descuento
@@ -134,18 +163,18 @@ def cotizador_optimo():
             complemento_renta = 0
         
         
-        # Generar tabla de resumen
+        #*********  Generar tabla de resumen  ******************+
         if (tipo_respuesta == 2 or tipo_respuesta == 6 ):
             #**** Seccion Tabla resumen ****
             #[solo_leasing]
             total_deducible_fiscal_leasing = renta_mensual_descuento*deducibilidad*plazo_meses
-            devolucion_inversion_solo_leasing = monto_inversion
+            devolucion_inversion_solo_leasing = rentas_deposito
             rendimiento = plazo_meses*descuento_mensual
             monto_pagado_leasing = pago_inicial_total - rentas_deposito
             total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado_leasing
             ahorro_isr_esperado_leasing = total_deducible_fiscal_leasing*isr
             total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
-            devolucion_rentas_deposito = (rentas_deposito if monto_inversion == 0 else 0)
+            devolucion_rentas_deposito = (rentas_deposito if rentas_deposito == 0 else 0)
             beneficio_solo_leasing = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing + devolucion_rentas_deposito
             costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
             
@@ -252,12 +281,12 @@ def cotizador_optimo():
                     }
                 }
 
-        # Generar tabla de facturacion
+        #*************   Generar tabla de facturacion   ***********************
         if (tipo_respuesta == 3 or tipo_respuesta == 6):
             if num_parametros_facturacion < 1 or num_parametros_facturacion > 10:
                 return jsonify({"error": "num_parametros_facturacion solo puede estar entre 1 y 10."}), 400
             if tipo_vehiculo not in cat_base_deducible:
-                return jsonify({"error": "Tipo_vehiculo no contiene un valor permitido."}), 400
+                return jsonify({"error": "tipo_vehiculo no contiene un valor permitido."}), 400
 
             g_administracion = complemento_renta * (cat_conceptos_factura['g_administracion']['media'] + random.uniform(-cat_conceptos_factura['g_administracion']['variacion'],cat_conceptos_factura['g_administracion']['variacion']))
             g_arrendamiento = complemento_renta * (cat_conceptos_factura['g_arrendamiento']['media'] + random.uniform(-cat_conceptos_factura['g_arrendamiento']['variacion'],cat_conceptos_factura['g_arrendamiento']['variacion']))
@@ -288,7 +317,8 @@ def cotizador_optimo():
                 "Renta_leasing":  round(renta_leasing,2)
             }
             num_parametros_facturacion = num_parametros_facturacion
-        # Generar tabla de amortización
+
+        #****************+   Generar tabla de amortización   **********************
         if (tipo_respuesta == 1 or tipo_respuesta == 6):
             tabla_amortizacion = []
             saldo_pendiente = monto_arrendamiento_siva
@@ -311,11 +341,11 @@ def cotizador_optimo():
                     "saldo_pendiente": round(max(residual_siva, saldo_pendiente), 2)  # Asegura que el saldo no sea negativo
                 })
 
-        # Tabla de Interna
+        #**************   Tabla de Interna   ***********************
         if (tipo_respuesta == 4 or tipo_respuesta == 6 ):
             tabla_interna = {}
             
-        # Tabla de cotizacion
+        #**************   Tabla de cotizacion   **********************
         if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
             tabla_cotizacion = {
                 "Residual_siva": round(residual_siva,2),
@@ -373,6 +403,8 @@ def cotizador_optimo():
                 "tabla_cotizacion": tabla_cotizacion,
                 "tabla_facturacion": tabla_facturacion
             }
+        if fuente_consulta == 1 and admin_message != '':
+            response["admin_message"] = admin_message
         return jsonify(response)
 
     except KeyError as e:

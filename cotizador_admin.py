@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key' # Cambia esto por una clave secreta fuerte
 
 CONFIG_FILE = 'config.info'
-API_URL = "http://54.152.171.128:5000/cotizador_optimo"
+API_URL = "http://127.0.0.1:5000/cotizador_optimo"
 
 def load_config():
     """Carga la configuración desde el archivo JSON."""
@@ -189,14 +189,30 @@ def cotizador():
             seguro = float(request.form.get('seguro', 0))
             pago_inicial_total = float(request.form.get('pago_inicial_total', 0))
             residual_siva = float(request.form.get('residual_siva', 0))
-            monto_inversion = float(request.form.get('monto_inversion', 0))
-            deposito_garantia = float(request.form.get('deposito_garantia', 0))
+            tasa_residual_siva = float(request.form.get('tasa_residual_siva', 0))
+            if (residual_siva > 0 and tasa_residual_siva > 0) or (residual_siva == 0 and tasa_residual_siva == 0):
+                error_message = "Solo debes proporcionar uno de los dos, monto residual o la tasa de residual."
+                flash(error_message, 'error')
+            elif tasa_residual_siva > 0:
+                residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
+                
+            rentas_deposito = float(request.form.get('rentas_deposito', 0))
+            fondo_reserva = float(request.form.get('fondo_reserva', 0))
+            tipo_activo = request.form.get('tipo_activo', 'Auto')
             tipo_vehiculo = request.form.get('tipo_vehiculo', 'G')
             tasa_comision_apertura = float(request.form.get('tasa_comision_apertura', 1))
             tasa_interes_anual = float(request.form.get('tasa_interes_anual', 0))
+            plan_tasa = request.form.get('plan_tasa')
+            if (plan_tasa != '' and tasa_interes_anual > 0) or (plan_tasa == '' and tasa_interes_anual == 0):
+                error_message = "Solo debes proporcionar uno de los dos, Plan del leasing o la tasa de interes anual."
+                flash(error_message, 'error')
+            elif plan_tasa != '':
+                tasa_interes_anual = 50
+            
             num_parametros_facturacion = int(request.form.get('num_parametros_facturacion', 10))
             tipo_respuesta = int(6)
-
+            fuente_consulta = 1
+            
             payload = {
                 "valor_factura": valor_factura,
                 "accesorios": accesorios,
@@ -204,20 +220,23 @@ def cotizador():
                 "seguro": seguro,
                 "pago_inicial_total": pago_inicial_total,
                 "residual_siva": residual_siva,
-                "monto_inversion": monto_inversion,
-                "deposito_garantia": deposito_garantia,
+                "rentas_deposito": rentas_deposito,
+                "fondo_reserva": fondo_reserva,
+                "tipo_activo": tipo_activo,
                 "tipo_vehiculo": tipo_vehiculo,
                 "tasa_comision_apertura": tasa_comision_apertura,
                 "tasa_interes_anual": tasa_interes_anual,
                 "num_parametros_facturacion": num_parametros_facturacion,
-                "tipo_respuesta": tipo_respuesta
+                "tipo_respuesta": tipo_respuesta,
+                "fuente_consulta": fuente_consulta
             }
             
             headers = {'Content-Type': 'application/json'}
             response = requests.post(API_URL, json=payload, headers=headers)
             response.raise_for_status() # Lanza un HTTPError si la respuesta fue un error
             api_response = response.json()
-            #flash('Consulta a la API realizada exitosamente!', 'success')
+            if 'admin_message' in api_response:
+                flash(api_response['admin_message'], 'success')
         except requests.exceptions.RequestException as e:
             error_message = f"Error al conectar con la API: {e}"
             flash(error_message, 'error')
@@ -228,9 +247,7 @@ def cotizador():
             error_message = f"Ocurrió un error inesperado: {e}"
             flash(error_message, 'error')
 
-    return render_template('cotizador.html', api_response = api_response, error_message=error_message,
-                           amortizacion=(api_response['tabla_amortizacion'] if api_response else ""),
-                           resumen=(api_response["tabla_resumen"] if api_response else ""))
+    return render_template('cotizador.html', api_response = api_response, error_message=error_message)
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)

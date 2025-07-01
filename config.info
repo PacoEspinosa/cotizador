@@ -30,6 +30,11 @@
 "36": 18400, 
 "48": 22700
 },
+"catalogo_tipo_activo": 
+{"Auto": 1,
+"Tracto/maquina": 1,
+"Bicicleta": 1
+},
 "catalogo_conceptos_factura": 
 {"g_administracion": {
 	"media": 0.2831,
@@ -70,6 +75,55 @@
 "gestoria_seguro": {
 	"media": 0.0528,
 	"variacion": 0.03344
+	}
+},
+"catalogo_valor_residual": 
+{"12": {
+	"min": 5,
+	"max": 50
+	},
+"24": {
+	"min": 5,
+	"max": 40
+	},
+"36": {
+	"min": 5,
+	"max": 35
+	},
+"48": {
+	"min": 5,
+	"max": 25
+	},
+"Bicicleta": {
+	"min": 5,
+	"max": 5
+	}
+},
+"catalogo_tasa_anual": 
+{"A": {
+	"Auto": 32,
+	"Tracto/maquina": 34,
+	"Bicicleta": 45
+	},
+"B": {
+	"Auto": 33,
+	"Tracto/maquina": 35,
+	"Bicicleta": 45
+	},
+"C": {
+	"Auto": 34,
+	"Tracto/maquina": 36,
+	"Bicicleta": 45
+	},
+"D": {
+	"Auto": 35,
+	"Tracto/maquina": 37,
+	"Bicicleta": 45
+	},
+"E": {
+	"Auto": 36,
+	"Tracto/maquina": 38,
+	"Bicicleta": 45
 	}
 }
 }

@@ -25,15 +25,20 @@
         </div>
         <div class="form-group">
             <label for="residual_siva">Residual S/IVA:</label>
-            <input type="number" step="0.01" id="residual_siva" name="residual_siva" value="20000" required>
+            <input type="number" step="0.01" id="residual_siva" name="residual_siva" value="0" required>
+            <input type="number" step="0.01" id="tasa_residual_siva" name="tasa_residual_siva" value="5" required>
         </div>
         <div class="form-group">
-            <label for="monto_inversion">Monto Inversión:</label>
-            <input type="number" step="0.01" id="monto_inversion" name="monto_inversion" value="0" required>
+            <label for="monto_inversion">Rentas en Depósito:</label>
+            <input type="number" step="0.01" id="rentas_deposito" name="rentas_deposito" value="0" required>
         </div>
         <div class="form-group">
-            <label for="deposito_garantia">Depósito Garantía:</label>
-            <input type="number" step="0.01" id="deposito_garantia" name="deposito_garantia" value="0" required>
+            <label for="deposito_garantia">Fondo de Reserva:</label>
+            <input type="number" step="0.01" id="fondo_reserva" name="fondo_reserva" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="tipo_vehiculo">Tipo Activo:</label>
+            <input type="text" id="tipo_activo" name="tipo_activo" value="Auto" required>
         </div>
         <div class="form-group">
             <label for="tipo_vehiculo">Tipo Vehículo (H, E, G):</label>
@@ -46,6 +51,7 @@
         <div class="form-group">
             <label for="tasa_interes_anual">Tasa Interés Anual:</label>
             <input type="number" step="0.01" id="tasa_interes_anual" name="tasa_interes_anual" value="36" required>
+            <input type="text" step="0.01" id="plan_tasa" name="plan_tasa" value="">
         </div>
         <div class="form-group">
             <label for="num_parametros_facturacion">Número Parámetros Facturación:</label>
@@ -69,7 +75,7 @@
 
 			<div id="amortizacion" class="tabcontent" style="display: block;">
 				<h2>Tabla de Amortización</h2>
-				{% if amortizacion %}
+				{% if api_response.tabla_amortizacion %}
 					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
 					<table>
 						<thead>
@@ -152,7 +158,7 @@
 
 			<div id="resumen" class="tabcontent">
 				<h2>Tabla de Resumen</h2>
-				{% if resumen %}
+				{% if api_response.tabla_resumen %}
 					<p><strong>Pago Crédito Calculado:</strong> {{ "${:,.2f}".format(api_response.pago_credito_calculada) }}</p>
 					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
 					<table>
