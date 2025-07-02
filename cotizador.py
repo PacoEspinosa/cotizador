@@ -398,7 +398,7 @@ def cotizador_optimo():
                 "Residual_siva": round(residual_siva,2),
                 "Valor_inicial_arrenda": round(valor_inicial_arrenda,2),
                 "Pago_inicial_total": round(pago_inicial_total,2),
-                "deposito_garantia": round(deposito_garantia,2),
+                "Deposito_garantia": round(deposito_garantia,2),
                 "Renta_mensual_calculada": round(renta_mensual_calculada,2),
                 "Comision_apertura_siva": round(comision_apertura_siva,2),
                 "Descuento_mensual": round(descuento_mensual,2),
