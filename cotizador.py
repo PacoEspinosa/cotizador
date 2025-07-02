@@ -348,6 +348,52 @@ def cotizador_optimo():
             
         #**************   Tabla de cotizacion   **********************
         if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
+           
+            #Escenario 12 meses
+            renta_calculada_12M = nf.pmt(tasa_interes_mensual,12,-monto_arrendamiento_siva,residual_siva)
+            renta_descuento_12M = renta_calculada_12M - descuento_mensual
+            iva_renta_descuento_12M = renta_descuento_12M * iva
+            total_renta_12M =(renta_descuento_12M + iva_renta_descuento_12M)
+            tabla_12M = {
+                "Renta_calculada": round(renta_calculada_12M,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Renta_descuento": round(renta_descuento_12M,2),
+                "IVA_renta": round(iva_renta_descuento_12M,2),
+                "Fondo_reserva": round(0,2),
+                "Renta_mensual_total": round(total_renta_12M,2),
+                "Valor_residual": round(residual_siva,2),
+            }
+
+            #Escenario 24 meses
+            renta_calculada_24M = nf.pmt(tasa_interes_mensual,24,-monto_arrendamiento_siva,residual_siva)
+            renta_descuento_24M = renta_calculada_24M - descuento_mensual
+            iva_renta_descuento_24M = renta_descuento_24M * iva
+            total_renta_24M =(renta_descuento_24M + iva_renta_descuento_24M)
+            tabla_24M = {
+                "Renta_calculada": round(renta_calculada_24M,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Renta_descuento": round(renta_descuento_24M,2),
+                "IVA_renta": round(iva_renta_descuento_24M,2),
+                "Fondo_reserva": round(0,2),
+                "Renta_mensual_total": round(total_renta_24M,2),
+                "Valor_residual": round(residual_siva,2),
+            }
+
+            #Escenario 36 meses
+            renta_calculada_36M = nf.pmt(tasa_interes_mensual,36,-monto_arrendamiento_siva,residual_siva)
+            renta_descuento_36M = renta_calculada_36M - descuento_mensual
+            iva_renta_descuento_36M = renta_descuento_36M * iva
+            total_renta_36M =(renta_descuento_36M + iva_renta_descuento_36M)
+            tabla_36M = {
+                "Renta_calculada": round(renta_calculada_36M,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Renta_descuento": round(renta_descuento_36M,2),
+                "IVA_renta": round(iva_renta_descuento_36M,2),
+                "Fondo_reserva": round(0,2),
+                "Renta_mensual_total": round(total_renta_36M,2),
+                "Valor_residual": round(residual_siva,2),
+            }
+            
             tabla_cotizacion = {
                 "Residual_siva": round(residual_siva,2),
                 "Valor_inicial_arrenda": round(valor_inicial_arrenda,2),
@@ -361,9 +407,10 @@ def cotizador_optimo():
                 "Accesorios": round(accesorios,2),
                 "Iva_renta_mensual_descuento": round(iva_renta_mensual_descuento,2),
                 "Monto_arrendamiento_siva": round(monto_arrendamiento_siva,2),
-                "Total_renta_mensual_descuento":  round(total_renta_mensual_descuento,2)
+                "Total_renta_mensual_descuento":  round(total_renta_mensual_descuento,2),
+                "Fondo_reserva": round(0,2)
             }
-            
+
 
             
         if tipo_respuesta == 1:
@@ -391,7 +438,10 @@ def cotizador_optimo():
             }
         elif tipo_respuesta == 5:
             response = {
-                "tabla_cotizacion": tabla_cotizacion
+                "tabla_cotizacion": tabla_cotizacion,
+                "Tabla_12M": tabla_12M,
+                "Tabla_24M": tabla_24M,
+                "Tabla_36M": tabla_36M                
             }
         elif tipo_respuesta == 6:
             response = {
