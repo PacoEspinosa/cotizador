@@ -8,6 +8,7 @@ Created on Thu Jun 12 13:22:15 2025
 from flask import Flask, request, jsonify
 import json
 import numpy_financial as nf
+import random
 
 app = Flask(__name__)
 
@@ -35,10 +36,12 @@ def cotizador_optimo():
                                                              residual_siva,monto_inversion,deposito_garantia,tasa_comision_apertura,
                                                              tasa_interes_anual,tipo_respuesta]):
             return jsonify({"error": "Todos los campos deben ser numeros."}), 400
-        if plazo_meses <= 0 or valor_factura <= 0 or tasa_interes_anual <= 0:
-            return jsonify({"error": "Plazo, monto inicial y tasa de interés anual deben ser mayores que cero."}), 400
+        if plazo_meses <= 0 or valor_factura <= 0 or tasa_interes_anual <= 0 or tipo_respuesta <= 0:
+            return jsonify({"error": "Plazo, monto inicial, tasa de interés anual y tipo respuesta deben ser mayores que cero."}), 400
         if tasa_comision_apertura <= 0 or tasa_comision_apertura > 4:
             return jsonify({"error": "Comision de apertura solo puede estar entre 0 y 4."}), 400
+        if tipo_respuesta <= 0 or tipo_respuesta > 6:
+            return jsonify({"error": "Tipo_respuesta solo puede estar entre 1 y 6."}), 400
 
         # constantes configuracion
         text = open('config.info')
@@ -53,6 +56,7 @@ def cotizador_optimo():
         tasa_credito = config['credito']['tasa_credito']/100
         tasa_enganche = config['credito']['tasa_enganche']/100
         cat_base_deducible = config['catalogo_base_deducible']
+        cat_conceptos_factura = config['catalogo_conceptos_factura']
         
         # variables para calculo
         valor_siva = valor_factura/(1+iva)
@@ -109,7 +113,7 @@ def cotizador_optimo():
         total_renta_mensual_calculada = renta_mensual_calculada+iva_renta_mensual_calculada
         descuento_mensual = (0 if monto_inversion == 0 else monto_inversion*(tasa_descuento/12))
         renta_mensual_descuento = renta_mensual_calculada-descuento_mensual
-        iva_renta_mensual_descuento = renta_mensual_descuento+iva
+        iva_renta_mensual_descuento = renta_mensual_descuento*iva
         total_renta_mensual_descuento = renta_mensual_descuento+iva_renta_mensual_descuento
         renta_mensual_deducible = cat_base_deducible[tipo_vehiculo]
         if (renta_mensual_descuento*deducibilidad)>renta_mensual_deducible:
@@ -118,7 +122,8 @@ def cotizador_optimo():
             complemento_renta = 0
         
         
-        if (tipo_respuesta == 2 or tipo_respuesta == 4 ):
+        # Generar tabla de resumen
+        if (tipo_respuesta == 2 or tipo_respuesta == 6 ):
             #**** Seccion Tabla resumen ****
             #[solo_leasing]
             total_deducible_fiscal_leasing = renta_mensual_descuento*deducibilidad*plazo_meses
@@ -150,90 +155,124 @@ def cotizador_optimo():
             total_pagado_plan_credito = monto_pagado_credito + (pago_credito * plazo_meses)
             total_deducible_fiscal_credito = (max_valor_deducible if total_pagado_plan_credito>max_valor_deducible else total_pagado_plan_credito)
             ahorro_isr_esperado_credito = total_deducible_fiscal_credito*isr
-            total_iva_acreditable_credito = (total_deducible_fiscal_credito*iva) + (total_intereses_credito*iva)
+            total_iva_acreditable_credito = iva_enganche + (total_intereses_credito*iva)
             beneficio_credito = ahorro_isr_esperado_credito + total_iva_acreditable_credito
             costo_neto_credito = total_pagado_plan_credito - beneficio_credito
             
+            #[Compra]
+            total_pagado_plan_compra = valor_factura
+            total_iva_acreditable_compra = total_deducible_fiscal_credito*iva
+            beneficio_compra = ahorro_isr_esperado_credito + total_iva_acreditable_compra
+            costo_neto_compra = total_pagado_plan_compra - beneficio_compra
+            
             tabla_resumen = {
                 "Total Deducible Fiscal": {
-                    "Solo Leasing": total_deducible_fiscal_leasing,
-                    "Leasing + compra": total_deducible_fiscal_leasing,
-                    "Credito": total_deducible_fiscal_credito,
-                    "Compra": total_deducible_fiscal_credito
+                    "Solo Leasing": round(total_deducible_fiscal_leasing, 2),
+                    "Leasing + compra": round(total_deducible_fiscal_leasing, 2),
+                    "Credito": round(total_deducible_fiscal_credito, 2),
+                    "Compra": round(total_deducible_fiscal_credito, 2)
                     },
                 "Devolucion inversion":{
-                    "Solo Leasing": devolucion_inversion_solo_leasing,
-                    "Leasing + compra": devolucion_inversion_solo_leasing,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(devolucion_inversion_solo_leasing, 2),
+                    "Leasing + compra": round(devolucion_inversion_solo_leasing, 2),
+                    "Credito": round(0, 2),
+                    "Compra": round(0, 2)  
                     },
                 "Rendimiento":{
-                    "Solo Leasing": rendimiento,
-                    "Leasing + compra": rendimiento,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(rendimiento, 2),
+                    "Leasing + compra": round(rendimiento, 2),
+                    "Credito": round(0, 2),
+                    "Compra": round(0, 2)  
                     },
                 "Valor Residual":{
-                    "Solo Leasing": residual_siva,
-                    "Leasing + compra": residual_siva,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(residual_siva, 2),
+                    "Leasing + compra": round(residual_siva, 2),
+                    "Credito": round(0, 2),
+                    "Compra": round(0, 2)  
                     },
                 "Valor Comercial proyectado":{
-                    "Solo Leasing": 0,
-                    "Leasing + compra": valor_comercial_esperado,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(0, 2),
+                    "Leasing + compra": round(valor_comercial_esperado, 2),
+                    "Credito": round(0, 2),
+                    "Compra": round(0, 2) 
                     },
                 "Total Pagado Plan":{
-                    "Solo Leasing": total_pagado_plan_solo_leasing,
-                    "Leasing + compra": total_pagado_plan_leasing_compra,
-                    "Credito": total_pagado_plan_credito,
-                    "Compra": 0  
+                    "Solo Leasing": round(total_pagado_plan_solo_leasing, 2),
+                    "Leasing + compra": round(total_pagado_plan_leasing_compra, 2),
+                    "Credito": round(total_pagado_plan_credito, 2),
+                    "Compra":round(total_pagado_plan_compra, 2)  
                     },
                 "Ahorro ISR Esperado":{
-                    "Solo Leasing": ahorro_isr_esperado_leasing,
-                    "Leasing + compra": ahorro_isr_esperado_leasing,
-                    "Credito": ahorro_isr_esperado_credito,
-                    "Compra": 0  
+                    "Solo Leasing": round(ahorro_isr_esperado_leasing, 2),
+                    "Leasing + compra": round(ahorro_isr_esperado_leasing, 2),
+                    "Credito": round(ahorro_isr_esperado_credito, 2),
+                    "Compra": round(ahorro_isr_esperado_credito, 2) 
                     },
                 "Total IVA Acreditable":{
-                    "Solo Leasing": devolucion_inversion_solo_leasing,
-                    "Leasing + compra": devolucion_inversion_solo_leasing,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(total_iva_acreditable_leasing, 2),
+                    "Leasing + compra": round(total_iva_acreditable_leasing_compra, 2),
+                    "Credito": round(total_iva_acreditable_credito, 2),
+                    "Compra": round(total_iva_acreditable_compra, 2)  
                     },
                 "Ahorro Adquisicion":{
-                    "Solo Leasing": 0,
-                    "Leasing + compra": ahorro_compra,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(0, 2),
+                    "Leasing + compra": round(ahorro_compra, 2),
+                    "Credito": round(0, 2),
+                    "Compra": round(0, 2)  
                     },
                 "Devolucion Rentas en Deposito":{
-                    "Solo Leasing": devolucion_rentas_deposito,
-                    "Leasing + compra": devolucion_rentas_deposito,
-                    "Credito": 0,
-                    "Compra": 0  
+                    "Solo Leasing": round(devolucion_rentas_deposito, 2),
+                    "Leasing + compra": round(devolucion_rentas_deposito, 2),
+                    "Credito": round(0, 2),
+                    "Compra": round(0, 2)  
                     },
                 "Beneficio total":{
-                    "Solo Leasing": beneficio_solo_leasing,
-                    "Leasing + compra": beneficio_leasing_compra,
-                    "Credito": beneficio_credito,
-                    "Compra": 0  
+                    "Solo Leasing": round(beneficio_solo_leasing, 2),
+                    "Leasing + compra": round(beneficio_leasing_compra, 2),
+                    "Credito": round(beneficio_credito, 2),
+                    "Compra": round(beneficio_compra, 2)  
                     },
                 "Costo neto":{
-                    "Solo Leasing": costo_neto_solo_leasing,
-                    "Leasing + compra": costo_neto_leasing_compra,
-                    "Credito": costo_neto_credito,
-                    "Compra": 0  
+                    "Solo Leasing": round(costo_neto_solo_leasing, 2),
+                    "Leasing + compra": round(costo_neto_leasing_compra, 2),
+                    "Credito": round(costo_neto_credito, 2),
+                    "Compra": round(costo_neto_compra, 2)
                     }
                 }
 
-        elif (tipo_respuesta == 3 or tipo_respuesta == 4):
-            tabla_facturacion = {}
+        # Generar tabla de facturacion
+        if (tipo_respuesta == 3 or tipo_respuesta == 6):
+            g_administracion = complemento_renta * (cat_conceptos_factura['g_administracion']['media'] + random.uniform(-cat_conceptos_factura['g_administracion']['variacion'],cat_conceptos_factura['g_administracion']['variacion']))
+            g_arrendamiento = complemento_renta * (cat_conceptos_factura['g_arrendamiento']['media'] + random.uniform(-cat_conceptos_factura['g_arrendamiento']['variacion'],cat_conceptos_factura['g_arrendamiento']['variacion']))
+            tmp_complemento_renta = complemento_renta - g_administracion - g_arrendamiento
+            gps = tmp_complemento_renta * cat_conceptos_factura['gps']['media']
+            instalacion_gps =  tmp_complemento_renta * cat_conceptos_factura['instalacion_gps']['media']
+            alta_vehiculo =  tmp_complemento_renta * cat_conceptos_factura['alta_vehiculo']['media']
+            gastos_notariales =  tmp_complemento_renta * cat_conceptos_factura['gastos_notariales']['media']
+            seguro_fac =  tmp_complemento_renta * cat_conceptos_factura['seguro_fac']['media']
+            telemetria =  tmp_complemento_renta * cat_conceptos_factura['telemetria']['media']
+            gestoria_alta =  tmp_complemento_renta * cat_conceptos_factura['gestoria_alta']['media']
+            gestoria_seguro =  tmp_complemento_renta * cat_conceptos_factura['gestoria_seguro']['media']
+            suma_conceptos = g_administracion + g_arrendamiento + gps + instalacion_gps + alta_vehiculo
+            suma_conceptos += gastos_notariales + seguro_fac + telemetria + gestoria_alta +gestoria_seguro
+            renta_leasing = renta_mensual_descuento - suma_conceptos
+            
+            tabla_facturacion = {
+                "Gastos_administracion": round(g_administracion,2),
+                "Gastos_arrendamiento": round(g_arrendamiento,2),
+                "GPS": round(gps,2),
+                "Instalacion_GPS": round(instalacion_gps,2),
+                "Alta_vehiculo": round(alta_vehiculo,2),
+                "Gastos_notariales": round(gastos_notariales,2),
+                "Seguro_factura": round(seguro_fac,2),
+                "Telemetria": round(telemetria,2),
+                "Gestoria_alta_vehiculo": round(gestoria_alta,2),
+                "Gestoria_seguro": round(gestoria_seguro,2),
+                "Renta_leasing":  round(renta_leasing,2)
+            }
             num_parametros_facturacion = num_parametros_facturacion
-        elif (tipo_respuesta == 1 or tipo_respuesta == 4):
-            # Generar tabla de amortización
+        # Generar tabla de amortización
+        if (tipo_respuesta == 1 or tipo_respuesta == 6):
             tabla_amortizacion = []
             saldo_pendiente = monto_arrendamiento_siva
     
@@ -255,6 +294,77 @@ def cotizador_optimo():
                     "saldo_pendiente": round(max(residual_siva, saldo_pendiente), 2)  # Asegura que el saldo no sea negativo
                 })
 
+        # Tabla de Interna
+        if (tipo_respuesta == 4 or tipo_respuesta == 6 ):
+            tabla_interna = {}
+            
+        # Tabla de cotizacion
+        if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
+            
+            #Escenario 12 meses
+            renta_calculada_12M = nf.pmt(tasa_interes_mensual,12,-monto_arrendamiento_siva,residual_siva)
+            renta_descuento_12M = renta_calculada_12M - descuento_mensual
+            iva_renta_descuento_12M = renta_descuento_12M * iva
+            total_renta_12M =(renta_descuento_12M + iva_renta_descuento_12M)
+            tabla_12M = {
+                "Renta_calculada": round(renta_calculada_12M,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Renta_descuento": round(renta_descuento_12M,2),
+                "IVA_renta": round(iva_renta_descuento_12M,2),
+                "Fondo_reserva": round(0,2),
+                "Renta_mensual_total": round(total_renta_12M,2),
+                "Valor_residual": round(residual_siva,2),
+            }
+
+            #Escenario 24 meses
+            renta_calculada_24M = nf.pmt(tasa_interes_mensual,24,-monto_arrendamiento_siva,residual_siva)
+            renta_descuento_24M = renta_calculada_24M - descuento_mensual
+            iva_renta_descuento_24M = renta_descuento_24M * iva
+            total_renta_24M =(renta_descuento_24M + iva_renta_descuento_24M)
+            tabla_24M = {
+                "Renta_calculada": round(renta_calculada_24M,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Renta_descuento": round(renta_descuento_24M,2),
+                "IVA_renta": round(iva_renta_descuento_24M,2),
+                "Fondo_reserva": round(0,2),
+                "Renta_mensual_total": round(total_renta_24M,2),
+                "Valor_residual": round(residual_siva,2),
+            }
+
+            #Escenario 36 meses
+            renta_calculada_36M = nf.pmt(tasa_interes_mensual,36,-monto_arrendamiento_siva,residual_siva)
+            renta_descuento_36M = renta_calculada_36M - descuento_mensual
+            iva_renta_descuento_36M = renta_descuento_36M * iva
+            total_renta_36M =(renta_descuento_36M + iva_renta_descuento_36M)
+            tabla_36M = {
+                "Renta_calculada": round(renta_calculada_36M,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Renta_descuento": round(renta_descuento_36M,2),
+                "IVA_renta": round(iva_renta_descuento_36M,2),
+                "Fondo_reserva": round(0,2),
+                "Renta_mensual_total": round(total_renta_36M,2),
+                "Valor_residual": round(residual_siva,2),
+            }
+            
+            tabla_cotizacion = {
+                "Residual_siva": round(residual_siva,2),
+                "Valor_inicial_arrenda": round(valor_inicial_arrenda,2),
+                "Pago_inicial_total": round(pago_inicial_total,2),
+                "Rentas_deposito": round(rentas_deposito,2),
+                "Renta_mensual_calculada": round(renta_mensual_calculada,2),
+                "Comision_apertura_siva": round(comision_apertura_siva,2),
+                "Descuento_mensual": round(descuento_mensual,2),
+                "Seguro": round(seguro,2),
+                "Renta_mensual_descuento": round(renta_mensual_descuento,2),
+                "Accesorios": round(accesorios,2),
+                "Iva_renta_mensual_descuento": round(iva_renta_mensual_descuento,2),
+                "Monto_arrendamiento_siva": round(monto_arrendamiento_siva,2),
+                "Total_renta_mensual_descuento":  round(total_renta_mensual_descuento,2),
+                "Fondo_reserva": round(0,2)
+            }
+            
+
+            
         if tipo_respuesta == 1:
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
@@ -270,15 +380,30 @@ def cotizador_optimo():
         elif tipo_respuesta == 3:
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
+                "descuento_mensual": round(descuento_mensual, 2),
+                "base_deducible":  round(renta_mensual_deducible, 2),
                 "tabla_facturacion": tabla_facturacion
             }
         elif tipo_respuesta == 4:
             response = {
+                "tabla_interna": tabla_interna
+            }
+        elif tipo_respuesta == 5:
+            response = {
+                "tabla_cotizacion": tabla_cotizacion,
+                "Tabla_12M": tabla_12M,
+                "Tabla_24M": tabla_24M,
+                "Tabla_36M": tabla_36M                
+            }
+        elif tipo_respuesta == 6:
+            response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
+                "descuento_mensual": round(descuento_mensual, 2),
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),
                 "pago_credito_calculada": round(pago_credito, 2),
                 "tabla_amortizacion": tabla_amortizacion,
                 "tabla_resumen": tabla_resumen,
+                "tabla_cotizacion": tabla_cotizacion,
                 "tabla_facturacion": tabla_facturacion
             }
         return jsonify(response)

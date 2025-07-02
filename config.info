@@ -19,5 +19,47 @@
 {"H": 8500, 
 "E": 8500, 
 "G": 6000
+},
+"catalogo_conceptos_factura": 
+{"g_administracion": {
+	"media": 0.2831,
+	"variacion": 0.09310
+	},
+"g_arrendamiento": {
+	"media": 0.3115,
+	"variacion": 0.09588
+	},
+"gps": {
+	"media": 0.1885,
+	"variacion": 0.06391
+	},
+"instalacion_gps": {
+	"media": 0.0994,
+	"variacion": 0.09195
+	},
+"alta_vehiculo": {
+	"media": 0.1166,
+	"variacion": 0.07878
+	},
+"gastos_notariales": {
+	"media": 0.1023,
+	"variacion": 0.07322
+	},
+"seguro_fac": {
+	"media": 0.2406,
+	"variacion": 0.06816
+	},
+"telemetria": {
+	"media": 0.1129,
+	"variacion": 0.06195
+	},
+"gestoria_alta": {
+	"media": 0.0870,
+	"variacion": 0.05299
+	},
+"gestoria_seguro": {
+	"media": 0.0528,
+	"variacion": 0.03344
+	}
 }
 }
