@@ -25,7 +25,7 @@ def cotizador_optimo():
         seguro = data['seguro']
         pago_inicial_total = data['pago_inicial_total']
         residual_siva = data['residual_siva']
-        rentas_deposito = data['rentas_deposito']
+        deposito_garantia = data['deposito_garantia']
         fondo_reserva = data['fondo_reserva']
         tipo_activo =  data['tipo_activo']
         tipo_vehiculo =  data['tipo_vehiculo']
@@ -37,21 +37,22 @@ def cotizador_optimo():
 
         # [[[[[[[[[[[   Validaciones básicas   ]]]]]]]]]]]
         if not all(isinstance(arg, (int, float)) for arg in [valor_factura,accesorios,plazo_meses, seguro, pago_inicial_total,
-                                                             residual_siva,rentas_deposito,fondo_reserva,tasa_comision_apertura,
+                                                             residual_siva,deposito_garantia,fondo_reserva,tasa_comision_apertura,
                                                              tasa_interes_anual,tipo_respuesta]):
             return jsonify({"error": "Todos los campos deben ser numeros."}), 400
         if plazo_meses <= 0 or valor_factura <= 0 or tasa_interes_anual <= 0 or tipo_respuesta <= 0:
             return jsonify({"error": "Plazo, monto inicial, tasa de interes anual y tipo respuesta deben ser mayores que cero."}), 400
         if tipo_respuesta <= 0 or tipo_respuesta > 6:
             return jsonify({"error": "Tipo_respuesta solo puede estar entre 1 y 6."}), 400
-        if rentas_deposito > 0 and fondo_reserva > 0:
-            return jsonify({"error": "Solo debe proporcionar uno de los conceptos, rentas_deposito o fondo_reserva."}), 400
-        if pago_inicial_total < (seguro + rentas_deposito):
+        if deposito_garantia > 0 and fondo_reserva > 0:
+            return jsonify({"error": "Solo debe proporcionar uno de los conceptos, deposito_garantia o fondo_reserva."}), 400
+        if pago_inicial_total < (seguro + deposito_garantia):
             return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el monto en inversion."}), 400
 
         # constantes configuracion
         text = open('config.info')
         config = json.loads(text.read())
+        text.close()
         iva = config['fiscal']['IVA']/100
         isr = config['fiscal']['ISR']/100
         max_valor_deducible = config['fiscal']['max_valor_deducible']
@@ -87,16 +88,16 @@ def cotizador_optimo():
         iva_pago_inicial_total = pago_inicial_total*iva
         seguro_siva = seguro/(1+iva)
         iva_seguro =  seguro*iva
-        if rentas_deposito == 0:
+        if deposito_garantia == 0:
             if fondo_reserva > 0:
-                rentas_deposito = fondo_reserva
+                deposito_garantia = fondo_reserva
             else:
                 if ((pago_inicial_total-seguro)/valor_siva) > precio_activo:
-                    rentas_deposito = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
+                    deposito_garantia = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
                 else:
-                    rentas_deposito = 0
+                    deposito_garantia = 0
         else:
-            rentas_deposito = rentas_deposito
+            deposito_garantia = deposito_garantia
         iva_residual = residual_siva*iva
         valor_residual = residual_siva + iva_residual
         tasa_residual = round((residual_siva/valor_siva),2)*100
@@ -111,7 +112,7 @@ def cotizador_optimo():
         otros_gastos_siva = cat_otros_gastos[bucket_meses]
         iva_otros_gastos = otros_gastos_siva*iva
         otros_gastos = otros_gastos_siva + iva_otros_gastos
-        valor_inicial_arrenda = pago_inicial_total - seguro - rentas_deposito
+        valor_inicial_arrenda = pago_inicial_total - seguro - deposito_garantia
         comision_apertura = (valor_factura + accesorios + otros_gastos - valor_inicial_arrenda)*(tasa_comision_apertura/100)
         comision_apertura_siva = comision_apertura/(1+iva)
         iva_comision_apertura = comision_apertura_siva*iva
@@ -124,9 +125,9 @@ def cotizador_optimo():
         
         #[[[[[[[[[[[  Validaciones  ]]]]]]]]]]]
         if monto_arrendamiento<0:
-            return jsonify({"error": "Revisar valor_factura, pago_inicial, rentas_deposito ó seguro, tienen algún valor erróneo."}), 400
+            return jsonify({"error": "Revisar valor_factura, pago_inicial, deposito_garantia ó seguro, tienen algún valor erróneo."}), 400
         if valor_inicial_arrenda < 0 or valor_inicial_arrenda > (valor_siva*precio_activo):
-            return jsonify({"error": "Revisar fondo_reserva, pago_inicial, rentas_deposito ó seguro, tienen algún valor erróneo."}), 400
+            return jsonify({"error": "Revisar fondo_reserva, pago_inicial, deposito_garantia ó seguro, tienen algún valor erróneo."}), 400
         if fuente_consulta == 0:
             if tipo_activo == 'Bicicleta':
                 if tasa_residual < cat_valor_residual[tipo_activo]["min"] or tasa_residual > cat_valor_residual[tipo_activo]["max"]:
@@ -152,7 +153,7 @@ def cotizador_optimo():
             renta_mensual_calculada = nf.pmt(tasa_interes_mensual,plazo_meses,-monto_arrendamiento_siva,residual_siva)
         iva_renta_mensual_calculada = renta_mensual_calculada*iva
         total_renta_mensual_calculada = renta_mensual_calculada+iva_renta_mensual_calculada
-        descuento_mensual = (0 if rentas_deposito == 0 else rentas_deposito*(tasa_descuento/12))
+        descuento_mensual = (0 if deposito_garantia == 0 else deposito_garantia*(tasa_descuento/12))
         renta_mensual_descuento = renta_mensual_calculada-descuento_mensual
         iva_renta_mensual_descuento = renta_mensual_descuento*iva
         total_renta_mensual_descuento = renta_mensual_descuento+iva_renta_mensual_descuento
@@ -168,14 +169,14 @@ def cotizador_optimo():
             #**** Seccion Tabla resumen ****
             #[solo_leasing]
             total_deducible_fiscal_leasing = renta_mensual_descuento*deducibilidad*plazo_meses
-            devolucion_inversion_solo_leasing = rentas_deposito
+            devolucion_inversion_solo_leasing = deposito_garantia
             rendimiento = plazo_meses*descuento_mensual
-            monto_pagado_leasing = pago_inicial_total - rentas_deposito
+            monto_pagado_leasing = pago_inicial_total - deposito_garantia
             total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado_leasing
             ahorro_isr_esperado_leasing = total_deducible_fiscal_leasing*isr
             total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
-            devolucion_rentas_deposito = (rentas_deposito if rentas_deposito == 0 else 0)
-            beneficio_solo_leasing = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing + devolucion_rentas_deposito
+            devolucion_deposito_garantia = (deposito_garantia if deposito_garantia == 0 else 0)
+            beneficio_solo_leasing = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing + devolucion_deposito_garantia
             costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
             
             #[leasing_compra]
@@ -183,7 +184,7 @@ def cotizador_optimo():
             total_pagado_plan_leasing_compra = total_pagado_plan_solo_leasing + valor_residual
             total_iva_acreditable_leasing_compra = total_iva_acreditable_leasing + iva_residual
             ahorro_compra = valor_comercial_esperado - valor_residual
-            beneficio_leasing_compra = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing_compra + ahorro_compra + devolucion_rentas_deposito
+            beneficio_leasing_compra = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing_compra + ahorro_compra + devolucion_deposito_garantia
             costo_neto_leasing_compra = total_pagado_plan_leasing_compra - beneficio_leasing_compra
             
             #[Credito]
@@ -262,8 +263,8 @@ def cotizador_optimo():
                     "Compra": round(0, 2)  
                     },
                 "Devolucion Rentas en Deposito":{
-                    "Solo Leasing": round(devolucion_rentas_deposito, 2),
-                    "Leasing + compra": round(devolucion_rentas_deposito, 2),
+                    "Solo Leasing": round(devolucion_deposito_garantia, 2),
+                    "Leasing + compra": round(devolucion_deposito_garantia, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
                     },
@@ -351,7 +352,7 @@ def cotizador_optimo():
                 "Residual_siva": round(residual_siva,2),
                 "Valor_inicial_arrenda": round(valor_inicial_arrenda,2),
                 "Pago_inicial_total": round(pago_inicial_total,2),
-                "Rentas_deposito": round(rentas_deposito,2),
+                "deposito_garantia": round(deposito_garantia,2),
                 "Renta_mensual_calculada": round(renta_mensual_calculada,2),
                 "Comision_apertura_siva": round(comision_apertura_siva,2),
                 "Descuento_mensual": round(descuento_mensual,2),

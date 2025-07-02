@@ -196,7 +196,7 @@ def cotizador():
             elif tasa_residual_siva > 0:
                 residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
                 
-            rentas_deposito = float(request.form.get('rentas_deposito', 0))
+            deposito_garantia = float(request.form.get('deposito_garantia', 0))
             fondo_reserva = float(request.form.get('fondo_reserva', 0))
             tipo_activo = request.form.get('tipo_activo', 'Auto')
             tipo_vehiculo = request.form.get('tipo_vehiculo', 'G')
@@ -220,7 +220,7 @@ def cotizador():
                 "seguro": seguro,
                 "pago_inicial_total": pago_inicial_total,
                 "residual_siva": residual_siva,
-                "rentas_deposito": rentas_deposito,
+                "deposito_garantia": deposito_garantia,
                 "fondo_reserva": fondo_reserva,
                 "tipo_activo": tipo_activo,
                 "tipo_vehiculo": tipo_vehiculo,
