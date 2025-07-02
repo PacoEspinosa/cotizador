@@ -37,11 +37,13 @@ def cotizador_optimo():
                                                              tasa_interes_anual,tipo_respuesta]):
             return jsonify({"error": "Todos los campos deben ser numeros."}), 400
         if plazo_meses <= 0 or valor_factura <= 0 or tasa_interes_anual <= 0 or tipo_respuesta <= 0:
-            return jsonify({"error": "Plazo, monto inicial, tasa de interés anual y tipo respuesta deben ser mayores que cero."}), 400
-        if tasa_comision_apertura <= 0 or tasa_comision_apertura > 4:
-            return jsonify({"error": "Comision de apertura solo puede estar entre 0 y 4."}), 400
+            return jsonify({"error": "Plazo, monto inicial, tasa de interes anual y tipo respuesta deben ser mayores que cero."}), 400
         if tipo_respuesta <= 0 or tipo_respuesta > 6:
             return jsonify({"error": "Tipo_respuesta solo puede estar entre 1 y 6."}), 400
+        if monto_inversion > 0 and deposito_garantia > 0:
+            return jsonify({"error": "Solo debe proporcionar uno de los conceptos, monto_inversion o deposito_garantia."}), 400
+        if pago_inicial_total < (seguro + monto_inversion):
+            return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el monto en inversion."}), 400
 
         # constantes configuracion
         text = open('config.info')
@@ -57,7 +59,13 @@ def cotizador_optimo():
         tasa_enganche = config['credito']['tasa_enganche']/100
         cat_base_deducible = config['catalogo_base_deducible']
         cat_conceptos_factura = config['catalogo_conceptos_factura']
+        tasa_comision_min = config['catalogo_tasa_comision']['min']
+        tasa_comision_max = config['catalogo_tasa_comision']['max']
+        cat_otros_gastos = config['catalogo_otros_gastos']
         
+        if tasa_comision_apertura <= tasa_comision_min or tasa_comision_apertura > tasa_comision_max:
+            return jsonify({"error": "Comision de apertura solo puede estar entre 0 y 4."}), 400
+
         # variables para calculo
         valor_siva = valor_factura/(1+iva)
         iva_auto = valor_siva*iva
@@ -80,13 +88,13 @@ def cotizador_optimo():
         iva_residual = residual_siva*iva
         valor_residual = residual_siva + iva_residual
         if plazo_meses <= 12:
-            otros_gastos_siva = 9800
+            otros_gastos_siva = cat_otros_gastos['12']
         elif plazo_meses <= 24:
-            otros_gastos_siva = 14100
+            otros_gastos_siva = cat_otros_gastos['24']
         elif plazo_meses <= 36:
-            otros_gastos_siva = 18400
+            otros_gastos_siva = cat_otros_gastos['36']
         else:
-            otros_gastos_siva = 22700
+            otros_gastos_siva = cat_otros_gastos['48']
         iva_otros_gastos = otros_gastos_siva*iva
         otros_gastos = otros_gastos_siva + iva_otros_gastos
         valor_inicial_arrenda = pago_inicial_total - seguro - rentas_deposito
@@ -100,6 +108,10 @@ def cotizador_optimo():
         enganche_siva = enganche/(1+iva)
         iva_enganche = enganche_siva*iva
         
+        if monto_arrendamiento<0:
+            return jsonify({"error": "Revisar valor_factura, pago_inicial, monto_inversion ó seguro, tienen algún valor erróneo."}), 400
+        if valor_inicial_arrenda < 0 or valor_inicial_arrenda > (valor_siva*precio_activo):
+            return jsonify({"error": "Revisar deposito_garantia, pago_inicial, monto_inversion ó seguro, tienen algún valor erróneo."}), 400
         
         # Convertir tasa de interés anual a mensual
         tasa_interes_mensual = (tasa_interes_anual / 100) / 12
@@ -242,6 +254,11 @@ def cotizador_optimo():
 
         # Generar tabla de facturacion
         if (tipo_respuesta == 3 or tipo_respuesta == 6):
+            if num_parametros_facturacion < 1 or num_parametros_facturacion > 10:
+                return jsonify({"error": "num_parametros_facturacion solo puede estar entre 1 y 10."}), 400
+            if tipo_vehiculo not in cat_base_deducible:
+                return jsonify({"error": "Tipo_vehiculo no contiene un valor permitido."}), 400
+
             g_administracion = complemento_renta * (cat_conceptos_factura['g_administracion']['media'] + random.uniform(-cat_conceptos_factura['g_administracion']['variacion'],cat_conceptos_factura['g_administracion']['variacion']))
             g_arrendamiento = complemento_renta * (cat_conceptos_factura['g_arrendamiento']['media'] + random.uniform(-cat_conceptos_factura['g_arrendamiento']['variacion'],cat_conceptos_factura['g_arrendamiento']['variacion']))
             tmp_complemento_renta = complemento_renta - g_administracion - g_arrendamiento
