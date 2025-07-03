@@ -182,6 +182,7 @@ def cotizador():
     """
     api_response = None
     error_message = None
+    payload = {}
 
     if request.method == 'POST':
         try:
@@ -251,7 +252,7 @@ def cotizador():
             flash(error_message, 'error')
 
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
-                           tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], input_lines = (payload if api_response else []))
+                           tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], input_lines = (payload if len(payload) > 0 else []))
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)

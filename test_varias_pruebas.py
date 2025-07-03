@@ -161,3 +161,12 @@ def index():
         {"key": "b_key", "value": "value_b"}
     ]
     return jsonify(data)
+
+#******************************
+test = True
+my_dict = {}
+if test:
+    my_dict = {"apple": 1, "banana": 2, "cherry": 3}
+
+dict_length = len(my_dict)
+print(dict_length)
