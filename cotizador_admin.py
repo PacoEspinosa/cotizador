@@ -210,7 +210,7 @@ def cotizador():
                 error_message = "Solo debes proporcionar uno de los dos, Plan del leasing o la tasa de interes anual."
                 flash(error_message, 'error')
             elif plan_tasa != '':
-                tasa_interes_anual = 50
+                tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
             
             num_parametros_facturacion = int(request.form.get('num_parametros_facturacion', 10))
             tipo_respuesta = int(6)
