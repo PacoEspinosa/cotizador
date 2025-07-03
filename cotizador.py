@@ -47,7 +47,7 @@ def cotizador_optimo():
         if deposito_garantia > 0 and fondo_reserva > 0:
             return jsonify({"error": "Solo debe proporcionar uno de los conceptos, deposito_garantia o fondo_reserva."}), 400
         if pago_inicial_total < (seguro + deposito_garantia):
-            return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el monto en inversion."}), 400
+            return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el deposito en garantia."}), 400
 
         # constantes configuracion
         text = open('config.info')
@@ -207,8 +207,7 @@ def cotizador_optimo():
             beneficio_compra = ahorro_isr_esperado_credito + total_iva_acreditable_compra
             costo_neto_compra = total_pagado_plan_compra - beneficio_compra
             
-            tabla_resumen = {
-                "Total Deducible Fiscal": {
+            tabla_resumen = {"Total Deducible Fiscal": {
                     "Solo Leasing": round(total_deducible_fiscal_leasing, 2),
                     "Leasing + compra": round(total_deducible_fiscal_leasing, 2),
                     "Credito": round(total_deducible_fiscal_credito, 2),

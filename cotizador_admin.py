@@ -14,7 +14,10 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key' # Cambia esto por una clave secreta fuerte
 
 CONFIG_FILE = 'config.info'
-API_URL = "http://127.0.0.1:5000/cotizador_optimo"
+text = open(CONFIG_FILE)
+config = json.loads(text.read())
+text.close()
+API_URL = config["cotizacion_admin_config"]["url_produccion"]
 
 def load_config():
     """Carga la configuración desde el archivo JSON."""
@@ -247,7 +250,8 @@ def cotizador():
             error_message = f"Ocurrió un error inesperado: {e}"
             flash(error_message, 'error')
 
-    return render_template('cotizador.html', api_response = api_response, error_message=error_message)
+    return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
+                           tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], input_lines = (payload if api_response else []))
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)

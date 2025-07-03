@@ -1,4 +1,7 @@
-{"Cotizacion_Config": 
+{"cotizacion_admin_config": 
+{"url_produccion": "http://54.152.171.128:5000/cotizador_optimo"
+}, 
+"Cotizacion_Config": 
 {"precio_activo": 45, 
 "tasa_descuento": 10, 
 "disminucion_valor": 25, 
@@ -34,6 +37,11 @@
 {"Auto": 1,
 "Tracto/maquina": 1,
 "Bicicleta": 1
+},
+"catalogo_tipo_vehiculo": 
+{"H": "Hibrido", 
+"E": "Electrico", 
+"G": "Gasolina"
 },
 "catalogo_conceptos_factura": 
 {"g_administracion": {

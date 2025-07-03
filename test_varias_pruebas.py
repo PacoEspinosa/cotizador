@@ -147,3 +147,17 @@ formato_moneda = f"${renta_mensual:,.2f} MXN"
 print(formato_moneda)  # Output: $12,345.68 MXN
 
 print("$%.2f" | format(renta_mensual))
+
+#**********************************
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    data = [
+        {"key": "c_key", "value": "value_c"},
+        {"key": "a_key", "value": "value_a"},
+        {"key": "b_key", "value": "value_b"}
+    ]
+    return jsonify(data)
