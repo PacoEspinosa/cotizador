@@ -194,8 +194,8 @@ def cotizador():
             pago_inicial_total = float(request.form.get('pago_inicial_total', 0))
             residual_siva = float(request.form.get('residual_siva', 0))
             tasa_residual_siva = float(request.form.get('tasa_residual_siva', 0))
-            if (residual_siva > 0 and tasa_residual_siva > 0) or (residual_siva == 0 and tasa_residual_siva == 0):
-                error_message = "Solo debes proporcionar uno de los dos, monto residual o la tasa de residual."
+            if (residual_siva > 0 and tasa_residual_siva > 0) or ((residual_siva == 0 or residual_siva=='') and tasa_residual_siva == 0):
+                error_message = "Debes proporcionar solo uno de los dos, monto residual o la tasa de residual."
                 flash(error_message, 'error')
             elif tasa_residual_siva > 0:
                 residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)

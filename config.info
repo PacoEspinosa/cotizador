@@ -1,137 +1,138 @@
-{"cotizacion_admin_config": 
-{"url_produccion": "http://54.152.171.128:5000/cotizador_optimo"
-}, 
-"Cotizacion_Config": 
-{"precio_activo": 45, 
-"tasa_descuento": 10, 
-"disminucion_valor": 25, 
-"deducibilidad": 100, 
-"num_parametros_facturacion": 10
-}, 
-"credito": 
-{"tasa_credito": 28, 
-"tasa_enganche": 10
-}, 
-"fiscal": 
-{"IVA": 16, 
-"ISR": 30, 
-"depreciacion": 25, 
-"max_valor_deducible": 175000
-}, 
-"catalogo_base_deducible": 
-{"H": 8500, 
-"E": 8500, 
-"G": 6000
-},
-"catalogo_tasa_comision": 
-{"min": 0, 
-"max": 4
-},
-"catalogo_otros_gastos": 
-{"12": 9800, 
-"24": 14100,
-"36": 18400, 
-"48": 22700
-},
-"catalogo_tipo_activo": 
-{"Auto": 1,
-"Tracto/maquina": 1,
-"Bicicleta": 1
-},
-"catalogo_tipo_vehiculo": 
-{"H": "Hibrido", 
-"E": "Electrico", 
-"G": "Gasolina"
-},
-"catalogo_conceptos_factura": 
-{"g_administracion": {
-	"media": 0.2831,
-	"variacion": 0.09310
-	},
-"g_arrendamiento": {
-	"media": 0.3115,
-	"variacion": 0.09588
-	},
-"gps": {
-	"media": 0.1885,
-	"variacion": 0.06391
-	},
-"instalacion_gps": {
-	"media": 0.0994,
-	"variacion": 0.09195
-	},
-"alta_vehiculo": {
-	"media": 0.1166,
-	"variacion": 0.07878
-	},
-"gastos_notariales": {
-	"media": 0.1023,
-	"variacion": 0.07322
-	},
-"seguro_fac": {
-	"media": 0.2406,
-	"variacion": 0.06816
-	},
-"telemetria": {
-	"media": 0.1129,
-	"variacion": 0.06195
-	},
-"gestoria_alta": {
-	"media": 0.0870,
-	"variacion": 0.05299
-	},
-"gestoria_seguro": {
-	"media": 0.0528,
-	"variacion": 0.03344
-	}
-},
-"catalogo_valor_residual": 
-{"12": {
-	"min": 5,
-	"max": 50
-	},
-"24": {
-	"min": 5,
-	"max": 40
-	},
-"36": {
-	"min": 5,
-	"max": 35
-	},
-"48": {
-	"min": 5,
-	"max": 25
-	},
-"Bicicleta": {
-	"min": 5,
-	"max": 5
-	}
-},
-"catalogo_tasa_anual": 
-{"A": {
-	"Auto": 32,
-	"Tracto/maquina": 34,
-	"Bicicleta": 45
-	},
-"B": {
-	"Auto": 33,
-	"Tracto/maquina": 35,
-	"Bicicleta": 45
-	},
-"C": {
-	"Auto": 34,
-	"Tracto/maquina": 36,
-	"Bicicleta": 45
-	},
-"D": {
-	"Auto": 35,
-	"Tracto/maquina": 37,
-	"Bicicleta": 45
-	},
-"E": {
-	"Auto": 36,
-	"Tracto/maquina": 38,
-	"Bicicleta": 45
-	}
-}
+{
+  "cotizacion_admin_config": {
+    "url_produccion": "http://127.0.0.1:5000/cotizador_optimo"
+  },
+  "Cotizacion_Config": {
+    "precio_activo": 45,
+    "tasa_descuento": 10,
+    "disminucion_valor": 25,
+    "deducibilidad": 100,
+    "num_parametros_facturacion": 10
+  },
+  "credito": {
+    "tasa_credito": 28,
+    "tasa_enganche": 10
+  },
+  "fiscal": {
+    "IVA": 16,
+    "ISR": 30,
+    "depreciacion": 25,
+    "max_valor_deducible": 175000
+  },
+  "catalogo_base_deducible": {
+    "H": 8500,
+    "E": 8500,
+    "G": 6000
+  },
+  "catalogo_tasa_comision": {
+    "min": 0,
+    "max": 4
+  },
+  "catalogo_otros_gastos": {
+    "12": 9800,
+    "24": 14100,
+    "36": 18400,
+    "48": 22700
+  },
+  "catalogo_tipo_activo": {
+    "Auto": 1,
+    "Tracto/maquina": 1,
+    "Bicicleta": 1
+  },
+  "catalogo_tipo_vehiculo": {
+    "H": "Hibrido",
+    "E": "Electrico",
+    "G": "Gasolina"
+  },
+  "catalogo_conceptos_factura": {
+    "g_administracion": {
+      "media": 0.2831,
+      "variacion": 0.0931
+    },
+    "g_arrendamiento": {
+      "media": 0.3115,
+      "variacion": 0.09588
+    },
+    "gps": {
+      "media": 0.1885,
+      "variacion": 0.06391
+    },
+    "instalacion_gps": {
+      "media": 0.0994,
+      "variacion": 0.09195
+    },
+    "alta_vehiculo": {
+      "media": 0.1166,
+      "variacion": 0.07878
+    },
+    "gastos_notariales": {
+      "media": 0.1023,
+      "variacion": 0.07322
+    },
+    "seguro_fac": {
+      "media": 0.2406,
+      "variacion": 0.06816
+    },
+    "telemetria": {
+      "media": 0.1129,
+      "variacion": 0.06195
+    },
+    "gestoria_alta": {
+      "media": 0.087,
+      "variacion": 0.05299
+    },
+    "gestoria_seguro": {
+      "media": 0.0528,
+      "variacion": 0.03344
+    }
+  },
+  "catalogo_valor_residual": {
+    "12": {
+      "min": 5,
+      "max": 50
+    },
+    "24": {
+      "min": 5,
+      "max": 40
+    },
+    "36": {
+      "min": 5,
+      "max": 35
+    },
+    "48": {
+      "min": 5,
+      "max": 25
+    },
+    "Bicicleta": {
+      "min": 5,
+      "max": 5
+    }
+  },
+  "catalogo_tasa_anual": {
+    "A": {
+      "Auto": 32,
+      "Tracto/maquina": 34,
+      "Bicicleta": 45
+    },
+    "B": {
+      "Auto": 33,
+      "Tracto/maquina": 35,
+      "Bicicleta": 45
+    },
+    "C": {
+      "Auto": 34,
+      "Tracto/maquina": 36,
+      "Bicicleta": 45
+    },
+    "D": {
+      "Auto": 35,
+      "Tracto/maquina": 37,
+      "Bicicleta": 45
+    },
+    "E": {
+      "Auto": 36,
+      "Tracto/maquina": 38,
+      "Bicicleta": 45
+    }
+  }
 }

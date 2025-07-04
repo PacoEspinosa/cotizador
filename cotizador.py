@@ -207,73 +207,73 @@ def cotizador_optimo():
             beneficio_compra = ahorro_isr_esperado_credito + total_iva_acreditable_compra
             costo_neto_compra = total_pagado_plan_compra - beneficio_compra
             
-            tabla_resumen = {"Total Deducible Fiscal": {
+            tabla_resumen = {"01.Total Deducible Fiscal": {
                     "Solo Leasing": round(total_deducible_fiscal_leasing, 2),
                     "Leasing + compra": round(total_deducible_fiscal_leasing, 2),
                     "Credito": round(total_deducible_fiscal_credito, 2),
                     "Compra": round(total_deducible_fiscal_credito, 2)
                     },
-                "Devolucion inversion":{
+                "02.Devolucion inversion":{
                     "Solo Leasing": round(devolucion_inversion_solo_leasing, 2),
                     "Leasing + compra": round(devolucion_inversion_solo_leasing, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
                     },
-                "Rendimiento":{
+                "03.Rendimiento":{
                     "Solo Leasing": round(rendimiento, 2),
                     "Leasing + compra": round(rendimiento, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
                     },
-                "Valor Residual":{
+                "04.Valor Residual":{
                     "Solo Leasing": round(residual_siva, 2),
                     "Leasing + compra": round(residual_siva, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
                     },
-                "Valor Comercial proyectado":{
+                "05.Valor Comercial proyectado":{
                     "Solo Leasing": round(0, 2),
                     "Leasing + compra": round(valor_comercial_esperado, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2) 
                     },
-                "Total Pagado Plan":{
+                "06.Total Pagado Plan":{
                     "Solo Leasing": round(total_pagado_plan_solo_leasing, 2),
                     "Leasing + compra": round(total_pagado_plan_leasing_compra, 2),
                     "Credito": round(total_pagado_plan_credito, 2),
                     "Compra":round(total_pagado_plan_compra, 2)  
                     },
-                "Ahorro ISR Esperado":{
+                "07.Ahorro ISR Esperado":{
                     "Solo Leasing": round(ahorro_isr_esperado_leasing, 2),
                     "Leasing + compra": round(ahorro_isr_esperado_leasing, 2),
                     "Credito": round(ahorro_isr_esperado_credito, 2),
                     "Compra": round(ahorro_isr_esperado_credito, 2) 
                     },
-                "Total IVA Acreditable":{
+                "08.Total IVA Acreditable":{
                     "Solo Leasing": round(total_iva_acreditable_leasing, 2),
                     "Leasing + compra": round(total_iva_acreditable_leasing_compra, 2),
                     "Credito": round(total_iva_acreditable_credito, 2),
                     "Compra": round(total_iva_acreditable_compra, 2)  
                     },
-                "Ahorro Adquisicion":{
+                "09.Ahorro Adquisicion":{
                     "Solo Leasing": round(0, 2),
                     "Leasing + compra": round(ahorro_compra, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
                     },
-                "Devolucion Rentas en Deposito":{
+                "10.Devolucion Rentas en Deposito":{
                     "Solo Leasing": round(devolucion_deposito_garantia, 2),
                     "Leasing + compra": round(devolucion_deposito_garantia, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
                     },
-                "Beneficio total":{
+                "11.Beneficio total":{
                     "Solo Leasing": round(beneficio_solo_leasing, 2),
                     "Leasing + compra": round(beneficio_leasing_compra, 2),
                     "Credito": round(beneficio_credito, 2),
                     "Compra": round(beneficio_compra, 2)  
                     },
-                "Costo neto":{
+                "12.Costo neto":{
                     "Solo Leasing": round(costo_neto_solo_leasing, 2),
                     "Leasing + compra": round(costo_neto_leasing_compra, 2),
                     "Credito": round(costo_neto_credito, 2),
