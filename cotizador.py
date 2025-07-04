@@ -12,6 +12,99 @@ import random
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+API_KEYS = {
+    "g4c)R@[UW2`4--Y£": "API1",
+    "997_/<[sow9m1,1H": "API2"
+}
+CONFIG_FILE = 'config.info'
+
+# --- Funciones  ---
+# Middleware o decorador para verificación de API Key
+def require_api_key(func):
+    def wrapper(*args, **kwargs):
+        if 'X-API-Key' not in request.headers or request.headers['X-API-Key'] not in API_KEYS:
+            return jsonify({"error": "Sin Acceso: API Key invalida o no proporcionada."}), 401
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__ 
+    return wrapper
+
+def read_config():
+    """
+    Lee la configuración desde el archivo config.info.
+    Si el archivo no existe, lo crea con la configuración por defecto.
+    """
+    try:
+        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error al leer el archivo JSON '{CONFIG_FILE}': {e}")
+        return {"error": "Config file is corrupted", "details": str(e)}
+    except Exception as e:
+        print(f"Error inesperado al leer '{CONFIG_FILE}': {e}")
+        return {"error": "Unexpected error reading config file", "details": str(e)}
+
+def write_config(data):
+    """
+    Escribe la configuración en el archivo config.info.
+    """
+    try:
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4)
+        return True
+    except Exception as e:
+        print(f"Error al escribir en el archivo '{CONFIG_FILE}': {e}")
+        return False
+
+def deep_merge(source, destination):
+    """
+    Fusiona recursivamente dos diccionarios.
+    Los valores del diccionario 'source' sobrescriben los de 'destination' si las claves son las mismas.
+    """
+    for key, value in source.items():
+        if isinstance(value, dict) and key in destination and isinstance(destination[key], dict):
+            # Si ambos son diccionarios, fusiona recursivamente
+            destination[key] = deep_merge(value, destination[key])
+        else:
+            # Si no son diccionarios o la clave no existe en destino, sobrescribe
+            destination[key] = value
+    return destination
+
+@app.route('/config', methods=['GET'])
+@require_api_key # Este endpoint SÍ requiere API Key
+def get_config():
+    """
+    Endpoint para consultar la configuración completa.
+    """
+    config_data = read_config()
+    if "error" in config_data:
+        return jsonify(config_data), 500
+    return jsonify(config_data)
+
+@app.route('/config', methods=['PUT'])
+@require_api_key # Este endpoint SÍ requiere API Key
+def update_config():
+    """
+    Endpoint para actualizar la configuración.
+    Permite actualizaciones parciales fusionando el JSON recibido con la configuración existente.
+    """
+    if not request.is_json:
+        return jsonify({"error": "Los cambios deben estar en formato JSON"}), 400
+
+    new_data = request.get_json()
+    if not isinstance(new_data, dict):
+        return jsonify({"error": "Los cambios deben estar en el formato indicado en la documentación."}), 400
+
+    current_config = read_config()
+    if "error" in current_config:
+        return jsonify(current_config), 500
+
+    # Fusiona la nueva data con la configuración actual
+    updated_config = deep_merge(new_data, current_config)
+
+    if write_config(updated_config):
+        return jsonify({"message": "Cambios realizados correctamente.", "nueva configuracion": updated_config}), 200
+    else:
+        return jsonify({"error": "Error al escribir los cambios."}), 500
 
 @app.route('/cotizador_optimo', methods=['POST'])
 def cotizador_optimo():
@@ -50,7 +143,7 @@ def cotizador_optimo():
             return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el deposito en garantia."}), 400
 
         # constantes configuracion
-        text = open('config.info')
+        text = open(CONFIG_FILE)
         config = json.loads(text.read())
         text.close()
         iva = config['fiscal']['IVA']/100
