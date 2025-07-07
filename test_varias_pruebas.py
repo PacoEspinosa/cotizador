@@ -37,6 +37,7 @@ import json
 
 tipo_respuesta = 'H'
 tipo_vehiculo = 'A'
+plan_tasa = "H"
 
 text = open('config.info')
 config = json.loads(text.read())
@@ -50,6 +51,8 @@ print(tasa_comision_min,tasa_comision_max )
 print(cat_base_deducible[tipo_respuesta])
 print(cat_conceptos_factura)
 print(cat_conceptos_factura['g_administracion']['media'])
+if plan_tasa not in config["catalogo_tasa_anual"]:
+    print("valor fuera de catalogo: plan_tasa")
 
 #***********
 import random

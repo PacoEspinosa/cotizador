@@ -124,6 +124,7 @@ def cotizador_optimo():
         tipo_vehiculo =  data['tipo_vehiculo']
         tasa_comision_apertura = data['tasa_comision_apertura']
         tasa_interes_anual = data['tasa_interes_anual']
+        plan_tasa = data['plan_tasa']
         num_parametros_facturacion = data['num_parametros_facturacion']
         tipo_respuesta = data['tipo_respuesta']
         fuente_consulta = data['fuente_consulta']
@@ -133,8 +134,8 @@ def cotizador_optimo():
                                                              residual_siva,deposito_garantia,fondo_reserva,tasa_comision_apertura,
                                                              tasa_interes_anual,tipo_respuesta]):
             return jsonify({"error": "Todos los campos deben ser numeros."}), 400
-        if plazo_meses <= 0 or valor_factura <= 0 or tasa_interes_anual <= 0 or tipo_respuesta <= 0:
-            return jsonify({"error": "Plazo, monto inicial, tasa de interes anual y tipo respuesta deben ser mayores que cero."}), 400
+        if plazo_meses <= 0 or valor_factura <= 0 or tipo_respuesta <= 0:
+            return jsonify({"error": "Plazo, monto inicial y tipo respuesta deben ser mayores que cero."}), 400
         if tipo_respuesta <= 0 or tipo_respuesta > 6:
             return jsonify({"error": "Tipo_respuesta solo puede estar entre 1 y 6."}), 400
         if deposito_garantia > 0 and fondo_reserva > 0:
@@ -163,6 +164,14 @@ def cotizador_optimo():
         cat_otros_gastos = config['catalogo_otros_gastos']
         cat_valor_residual = config['catalogo_valor_residual']
         
+        if plan_tasa not in config["catalogo_tasa_anual"]:
+            if plan_tasa != '':
+                return jsonify({"error": "plan_tasa:Valor fuera de catalogo."}), 400
+        if (plan_tasa != '' and tasa_interes_anual > 0) or (plan_tasa == '' and tasa_interes_anual == 0):
+            return jsonify({"error": "Solo debes proporcionar uno de los dos, Plan del leasing o la tasa de interes anual."}), 400
+        elif plan_tasa != '':
+            tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
+
         if tasa_comision_apertura <= tasa_comision_min or tasa_comision_apertura > tasa_comision_max:
             if fuente_consulta == 0:
                 return jsonify({"error": "Comision de apertura solo puede estar entre 0 y 4."}), 400

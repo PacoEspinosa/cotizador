@@ -212,6 +212,7 @@ def cotizador():
                 flash(error_message, 'error')
             elif plan_tasa != '':
                 tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
+                plan_tasa = ''
             
             num_parametros_facturacion = int(request.form.get('num_parametros_facturacion', 10))
             tipo_respuesta = int(6)
@@ -230,6 +231,7 @@ def cotizador():
                 "tipo_vehiculo": tipo_vehiculo,
                 "tasa_comision_apertura": tasa_comision_apertura,
                 "tasa_interes_anual": tasa_interes_anual,
+                "plan_tasa": plan_tasa,
                 "num_parametros_facturacion": num_parametros_facturacion,
                 "tipo_respuesta": tipo_respuesta,
                 "fuente_consulta": fuente_consulta

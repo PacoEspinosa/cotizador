@@ -1,6 +1,6 @@
 {
     "cotizacion_admin_config": {
-        "url_produccion": "http://54.152.171.128:5000/cotizador_optimo"
+        "url_produccion": "http://127.0.0.1:5000/cotizador_optimo"
     },
     "Cotizacion_Config": {
         "precio_activo": 45,
