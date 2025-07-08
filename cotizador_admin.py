@@ -194,10 +194,9 @@ def cotizador():
             pago_inicial_total = float(request.form.get('pago_inicial_total', 0))
             residual_siva = float(request.form.get('residual_siva', 0))
             tasa_residual_siva = float(request.form.get('tasa_residual_siva', 0))
-            if (residual_siva > 0 and tasa_residual_siva > 0) or ((residual_siva == 0 or residual_siva=='') and tasa_residual_siva == 0):
-                error_message = "Debes proporcionar solo uno de los dos, monto residual o la tasa de residual."
-                flash(error_message, 'error')
-            elif tasa_residual_siva > 0:
+            if (residual_siva > 0 and tasa_residual_siva > 0):
+                error_message = "Se tomará el porcentaje del residual, solo debes proporcionar uno de los 2."
+                flash(error_message, 'success')
                 residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
                 
             deposito_garantia = float(request.form.get('deposito_garantia', 0))
@@ -236,16 +235,24 @@ def cotizador():
                 "tipo_respuesta": tipo_respuesta,
                 "fuente_consulta": fuente_consulta
             }
-            
+            #flash(payload,"success")
             headers = {'Content-Type': 'application/json'}
             response = requests.post(API_URL, json=payload, headers=headers)
-            response.raise_for_status() # Lanza un HTTPError si la respuesta fue un error
-            api_response = response.json()
-            if 'admin_message' in api_response:
-                flash(api_response['admin_message'], 'success')
-        except requests.exceptions.RequestException as e:
-            error_message = f"Error al conectar con la API: {e}"
-            flash(error_message, 'error')
+            if not response.ok: # response.ok es True para 2xx, False para 4xx/5xx
+                error = response.json()
+                error_message = f"Error al conectar con la API: {error['error']}"
+                flash(error_message, 'error')
+            else:
+                api_response = response.json()
+                if 'admin_message' in api_response:
+                    flash(api_response['admin_message'], 'success')
+
+        except json.JSONDecodeError:
+            # Si no es JSON, imprimimos el texto plano de la respuesta
+            if not response.ok:
+                flash("Error detallado de la API: {response.text}","error")
+            else:
+                flash("Respuesta exitosa de la API no JSON: {response.text}","error")
         except ValueError:
             error_message = "Por favor, verifica que todos los campos numéricos tengan valores válidos."
             flash(error_message, 'error')

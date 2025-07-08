@@ -31,7 +31,6 @@ def require_api_key(func):
 def read_config():
     """
     Lee la configuración desde el archivo config.info.
-    Si el archivo no existe, lo crea con la configuración por defecto.
     """
     try:
         with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
