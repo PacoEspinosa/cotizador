@@ -1,2 +1,7 @@
 
 test_cotizador.py
+setup.py
+test_API_config.py
+test_error_handking.py
+test_varias_pruebas.py
+selectividad_validacion_API_Key.py
