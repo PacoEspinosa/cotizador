@@ -16,7 +16,7 @@ API_KEYS = {
     "g4c)R@[UW2`4--Y£": "API1",
     "997_/<[sow9m1,1H": "API2"
 }
-CONFIG_FILE = 'config.info'
+CONFIG_FILE = 'config_app.info'
 
 # --- Funciones  ---
 # Middleware o decorador para verificación de API Key
@@ -143,6 +143,10 @@ def cotizador_optimo():
             return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el deposito en garantia."}), 400
 
         # constantes configuracion
+        if fuente_consulta == 1:
+            CONFIG_FILE = 'config_admin.info'
+        else:
+            CONFIG_FILE = 'config_app.info'            
         text = open(CONFIG_FILE)
         config = json.loads(text.read())
         text.close()
