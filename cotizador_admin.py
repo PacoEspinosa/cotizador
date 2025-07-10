@@ -13,7 +13,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 app.secret_key = 'your_secret_key' # Cambia esto por una clave secreta fuerte
 
-CONFIG_FILE = 'config.info'
+CONFIG_FILE = 'config_admin.info'
 text = open(CONFIG_FILE)
 config = json.loads(text.read())
 text.close()
@@ -198,6 +198,8 @@ def cotizador():
                 error_message = "Se tomará el porcentaje del residual, solo debes proporcionar uno de los 2."
                 flash(error_message, 'success')
                 residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
+            if residual_siva == 0 and tasa_residual_siva > 0:
+                residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
                 
             deposito_garantia = float(request.form.get('deposito_garantia', 0))
             fondo_reserva = float(request.form.get('fondo_reserva', 0))
@@ -206,12 +208,8 @@ def cotizador():
             tasa_comision_apertura = float(request.form.get('tasa_comision_apertura', 1))
             tasa_interes_anual = float(request.form.get('tasa_interes_anual', 0))
             plan_tasa = request.form.get('plan_tasa')
-            if (plan_tasa != '' and tasa_interes_anual > 0) or (plan_tasa == '' and tasa_interes_anual == 0):
-                error_message = "Solo debes proporcionar uno de los dos, Plan del leasing o la tasa de interes anual."
-                flash(error_message, 'error')
-            elif plan_tasa != '':
+            if tasa_interes_anual == 0 and plan_tasa != '':
                 tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
-                plan_tasa = ''
             
             num_parametros_facturacion = int(request.form.get('num_parametros_facturacion', 10))
             tipo_respuesta = int(6)
