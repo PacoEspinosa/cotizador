@@ -3,3 +3,4 @@ gunicorn==23.0.0
 jason==0.1.7
 numpy==2.3.0
 numpy-financial==1.0.0
+requests==2.32.4
