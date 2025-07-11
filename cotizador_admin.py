@@ -142,7 +142,7 @@ def identificar_ofertas():
             comision_apertura = float(request.form['comision_apertura'])
             es_credito = request.form.get('es_credito') == 'on'
 
-            text = open('config.info')
+            text = open(CONFIG_FILE)
             config = json.loads(text.read())
             cat_otros_gastos = config['catalogo_otros_gastos']
             if plazo <= 12:
