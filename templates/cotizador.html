@@ -1,45 +1,137 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Función principal para formatear inputs
+		function formatInput(inputElement, formatType) {
+			let value = inputElement.value;
+
+			switch (formatType) {
+				case 'numberWithCommas':
+					// Eliminar cualquier caracter que no sea un dígito o un punto (para decimales)
+					value = value.replace(/[^\d.]/g, '');
+
+					// Separar la parte entera de la decimal si existe
+					let parts = value.split('.');
+					let integerPart = parts[0];
+					let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+					// Añadir comas a la parte entera
+					integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+					inputElement.value = integerPart + decimalPart;
+					break;
+
+				case 'uppercase':
+					inputElement.value = value.toUpperCase();
+					break;
+
+				case 'noSpaces':
+					inputElement.value = value.replace(/\s/g, '');
+					break;
+
+				// Puedes añadir más casos de formato aquí
+				case 'maxLength5': // Ejemplo: limitar a 5 caracteres
+					if (value.length > 5) {
+						inputElement.value = value.substring(0, 5);
+					}
+					break;
+
+				default:
+					// No aplicar formato específico si no se reconoce el tipo
+					break;
+			}
+		}
+
+		// --- Aplicación de los formatos a los inputs ---
+
+		// Ejemplo 1: Inputs con formato de número con comas
+		// Asigna la clase 'format-number-commas' a los inputs que quieras formatear
+		document.querySelectorAll('.format-number-commas').forEach(input => {
+			// Se formatea en el evento 'input' para una actualización en tiempo real
+			input.addEventListener('input', () => formatInput(input, 'numberWithCommas'));
+			// También se formatea al cargar la página si ya tienen un valor inicial
+			formatInput(input, 'numberWithCommas');
+		});
+
+		// Ejemplo 2: Inputs que se convierten a mayúsculas
+		// Asigna la clase 'format-uppercase' a los inputs que quieras formatear
+		document.querySelectorAll('.format-uppercase').forEach(input => {
+			input.addEventListener('input', () => formatInput(input, 'uppercase'));
+			formatInput(input, 'uppercase');
+		});
+
+		// Ejemplo 3: Inputs sin espacios
+		// Asigna la clase 'format-no-spaces' a los inputs que quieras formatear
+		document.querySelectorAll('.format-no-spaces').forEach(input => {
+			input.addEventListener('input', () => formatInput(input, 'noSpaces'));
+			formatInput(input, 'noSpaces');
+		});
+
+		// Ejemplo 4: Input con longitud máxima de 5 caracteres
+		// Asigna la clase 'format-max-length-5'
+		document.querySelectorAll('.format-max-length-5').forEach(input => {
+			input.addEventListener('input', () => formatInput(input, 'maxLength5'));
+			formatInput(input, 'maxLength5');
+		});
+
+		// --- Limpieza antes de enviar el formulario (opcional) ---
+		// Si necesitas que los números se envíen sin comas al servidor
+		// puedes añadir un manejador para el evento 'submit' del formulario.
+		const form = document.querySelector('form'); // O selecciona tu formulario por ID/clase
+		if (form) {
+			form.addEventListener('submit', () => {
+				document.querySelectorAll('.format-number-commas').forEach(input => {
+					// Eliminar las comas antes de enviar el formulario
+					input.value = input.value.replace(/,/g, '');
+				});
+				// Puedes añadir más lógica de limpieza para otros tipos de formato si es necesario
+			});
+		}
+	});
+	</script>
     <h1>Cotizador</h1>
     <form method="POST">
 	<table style="width:100%">
 		<tr>       
-            <th colspan="2"><label for="valor_factura">Valor Factura:</label></th>
-            <td><input type="number" step="0.01" id="valor_factura" name="valor_factura" value="{{ input_lines.valor_factura }}" required></td>
+            <th colspan="2"><label for="valor_factura">Valor Factura ($):</label></th>
+            <td><input type="text" class="format-number-commas" id="valor_factura" name="valor_factura" value="{{ input_lines.valor_factura }}" required></td>
 		</tr>
         <tr>
-            <th colspan="2"><label for="accesorios">Accesorios:</label></th>
-            <td><input type="number" step="0.01" id="accesorios" name="accesorios" value="{{ input_lines.accesorios }}" required></td>
+            <th colspan="2"><label for="accesorios">Accesorios ($):</label></th>
+            <td><input  type="text" class="format-number-commas" id="accesorios" name="accesorios" value="{{ input_lines.accesorios }}" required></td>
         </tr>
         <tr>
             <th colspan="2"><label for="plazo_meses">Plazo (meses):</label></th>
             <td><input type="number" id="plazo_meses" name="plazo_meses" value="{{ input_lines.plazo_meses }}" required></td>
         </tr>
         <tr>
-            <th colspan="2"><label for="seguro">Seguro:</label></th>
-            <td><input type="number" step="0.01" id="seguro" name="seguro" value="{{ input_lines.seguro }}" required></td>
+            <th colspan="2"><label for="seguro">Seguro ($):</label></th>
+            <td><input type="text" class="format-number-commas" id="seguro" name="seguro" value="{{ input_lines.seguro }}" required></td>
         </tr>
         <tr>
-            <th colspan="2"><label for="pago_inicial_total">Pago Inicial Total:</label></th>
-            <td><input type="number" step="0.01" id="pago_inicial_total" name="pago_inicial_total" value="{{ input_lines.pago_inicial_total }}" required></td>
+            <th colspan="2"><label for="pago_inicial_total">Pago Inicial Total ($):</label></th>
+            <td><input  type="text" class="format-number-commas" id="pago_inicial_total" name="pago_inicial_total" value="{{ input_lines.pago_inicial_total }}" required></td>
         </tr>
         <tr>
             <th rowspan="2">Residual S/IVA</th>
-			<th><label for="residual_siva">Valor:</label></th>
-            <td><input type="number" id="residual_siva" name="residual_siva" value="{{ input_lines.residual_siva if api_response else 0 }}"></td>
+			<th><label for="residual_siva">Valor ($):</label></th>
+            <td><input  type="text" class="format-number-commas" id="residual_siva" name="residual_siva" value="{{ input_lines.residual_siva if api_response else 0 }}"></td>
         </tr>
         <tr>
-			<th><label for="tasa_residual_siva">Porcentaje:</label></th>
+			<th><label for="tasa_residual_siva">Porcentaje (%):</label></th>
             <td><input type="number" step="0.01" id="tasa_residual_siva" name="tasa_residual_siva" value="0" required></td>
         </tr>
         <tr>
-            <th colspan="2"><label for="monto_inversion">Depósito en garantia:</label></th>
-            <td><input type="number" id="deposito_garantia" name="deposito_garantia" value="{{ input_lines.deposito_garantia }}" required></td>
+            <th><label for="monto_inversion">Depósito en garantia:</label></th>
+			<td><input type="checkbox" id="es_inversion" name="es_inversion" checked>
+            <label for="es_inversion">Es inversión?</label></td>
+            <td><input  type="text" class="format-number-commas" id="deposito_garantia" name="deposito_garantia" value="{{ input_lines.deposito_garantia }}" required></td>
         </tr>
         <tr>
-            <th colspan="2"><label for="deposito_garantia">Fondo de Reserva:</label></th>
-            <td><input type="number" step="0.01" id="fondo_reserva" name="fondo_reserva" value="{{ input_lines.fondo_reserva }}" required></td>
+            <th colspan="2"><label for="deposito_garantia">Fondo de Reserva (%):</label></th>
+            <td><input type="text" class="format-number-commas" id="fondo_reserva" name="fondo_reserva" value="{{ input_lines.fondo_reserva }}" required></td>
         </tr>
         <tr>
             <th colspan="2"><label for="tipo_activo">Tipo Activo:</label></th>
@@ -60,12 +152,12 @@
 			</select></td>
         </tr>
         <tr>
-            <th colspan="2"><label for="tasa_comision_apertura">Tasa Comisión Apertura:</label></th>
+            <th colspan="2"><label for="tasa_comision_apertura">Tasa Comisión Apertura (%):</label></th>
             <td><input type="number" step="0.01" id="tasa_comision_apertura" name="tasa_comision_apertura" value="{{ input_lines.tasa_comision_apertura }}" required></td>
         </tr>
         <tr>
             <th rowspan="2">Tasa Interés Anual:</th>
-            <th><label for="tasa_interes_anual">Tasa Interés:</label></th>
+            <th><label for="tasa_interes_anual">Tasa Interés (%):</label></th>
 			<td><input type="number" step="0.01" id="tasa_interes_anual" name="tasa_interes_anual" value="{{ input_lines.tasa_interes_anual }}" required></td>
         </tr>
         <tr>
@@ -102,6 +194,7 @@
 				<h2>Tabla de Amortización</h2>
 				{% if api_response.tabla_amortizacion %}
 					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
+					<p><strong>Valor Inicial Arrendamiento:</strong> {{ "${:,.2f}".format(api_response.valor_inicial_arrenda) }}</p>
 					<table>
 						<thead>
 							<tr>

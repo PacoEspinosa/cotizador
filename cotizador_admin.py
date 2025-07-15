@@ -201,8 +201,12 @@ def cotizador():
             if residual_siva == 0 and tasa_residual_siva > 0:
                 residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
                 
-            deposito_garantia = float(request.form.get('deposito_garantia', 0))
-            fondo_reserva = float(request.form.get('fondo_reserva', 0))
+            es_inversion = request.form.get('es_inversion', 0)
+            if es_inversion:
+                deposito_garantia = float(request.form.get('deposito_garantia', 0))
+            else:
+                fondo_reserva = float(request.form.get('deposito_garantia', 0))
+            fondo_reserva_mensual = float(request.form.get('fondo_reserva', 0))
             tipo_activo = request.form.get('tipo_activo', 'Auto')
             tipo_vehiculo = request.form.get('tipo_vehiculo', 'G')
             tasa_comision_apertura = float(request.form.get('tasa_comision_apertura', 1))

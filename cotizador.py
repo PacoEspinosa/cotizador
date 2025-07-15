@@ -201,8 +201,7 @@ def cotizador_optimo():
                     deposito_garantia = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
                 else:
                     deposito_garantia = 0
-        else:
-            deposito_garantia = deposito_garantia
+
         iva_residual = residual_siva*iva
         valor_residual = residual_siva + iva_residual
         tasa_residual = round((residual_siva/valor_siva),2)*100
@@ -392,20 +391,70 @@ def cotizador_optimo():
                 return jsonify({"error": "num_parametros_facturacion solo puede estar entre 1 y 10."}), 400
             if tipo_vehiculo not in cat_base_deducible:
                 return jsonify({"error": "tipo_vehiculo no contiene un valor permitido."}), 400
-
-            g_administracion = complemento_renta * (cat_conceptos_factura['g_administracion']['media'] + random.uniform(-cat_conceptos_factura['g_administracion']['variacion'],cat_conceptos_factura['g_administracion']['variacion']))
-            g_arrendamiento = complemento_renta * (cat_conceptos_factura['g_arrendamiento']['media'] + random.uniform(-cat_conceptos_factura['g_arrendamiento']['variacion'],cat_conceptos_factura['g_arrendamiento']['variacion']))
-            tmp_complemento_renta = complemento_renta - g_administracion - g_arrendamiento
-            gps = tmp_complemento_renta * cat_conceptos_factura['gps']['media']
-            instalacion_gps =  tmp_complemento_renta * cat_conceptos_factura['instalacion_gps']['media']
-            alta_vehiculo =  tmp_complemento_renta * cat_conceptos_factura['alta_vehiculo']['media']
-            gastos_notariales =  tmp_complemento_renta * cat_conceptos_factura['gastos_notariales']['media']
-            seguro_fac =  tmp_complemento_renta * cat_conceptos_factura['seguro_fac']['media']
-            telemetria =  tmp_complemento_renta * cat_conceptos_factura['telemetria']['media']
-            gestoria_alta =  tmp_complemento_renta * cat_conceptos_factura['gestoria_alta']['media']
-            gestoria_seguro =  tmp_complemento_renta * cat_conceptos_factura['gestoria_seguro']['media']
-            suma_conceptos = g_administracion + g_arrendamiento + gps + instalacion_gps + alta_vehiculo
-            suma_conceptos += gastos_notariales + seguro_fac + telemetria + gestoria_alta +gestoria_seguro
+            
+            g_administracion = 0
+            g_arrendamiento = 0
+            gps = 0
+            instalacion_gps = 0
+            alta_vehiculo = 0
+            gastos_notariales = 0
+            seguro_fac = 0
+            telemetria = 0
+            gestoria_alta = 0
+            gestoria_seguro = 0
+            peso = 0.0
+            if num_parametros_facturacion==1:
+                g_administracion = complemento_renta
+                suma_conceptos = g_administracion
+            elif num_parametros_facturacion==2:
+                g_administracion = complemento_renta * (.5 + random.uniform(-cat_conceptos_factura['g_administracion']['variacion'],cat_conceptos_factura['g_administracion']['variacion']))
+                g_arrendamiento = complemento_renta - g_administracion
+                suma_conceptos = g_administracion + g_arrendamiento
+                tmp_complemento_renta = complemento_renta - suma_conceptos
+            else:
+                g_administracion = complemento_renta * (cat_conceptos_factura['g_administracion']['media'] + random.uniform(-cat_conceptos_factura['g_administracion']['variacion'],cat_conceptos_factura['g_administracion']['variacion']))
+                g_arrendamiento = complemento_renta * (cat_conceptos_factura['g_arrendamiento']['media'] + random.uniform(-cat_conceptos_factura['g_arrendamiento']['variacion'],cat_conceptos_factura['g_arrendamiento']['variacion']))
+                suma_conceptos = g_administracion + g_arrendamiento
+                tmp_complemento_renta = complemento_renta - suma_conceptos
+                n = 2
+                for key in config['catalogo_conceptos_factura']:
+                    if key != 'g_administracion' and key != 'g_arrendamiento':
+                        peso += cat_conceptos_factura[key]['media']
+                        n += 1
+                        if n == num_parametros_facturacion: 
+                            break
+                n = 0
+                for key in config['catalogo_conceptos_factura']:
+                    if  key == 'g_administracion' or key == 'g_arrendamiento':
+                        n = n
+                    if key == 'gps':
+                        gps = tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += gps
+                    if key == 'instalacion_gps':
+                        instalacion_gps =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += instalacion_gps
+                    if key == 'alta_vehiculo':
+                        alta_vehiculo =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += alta_vehiculo
+                    if key == 'gastos_notariales':
+                        gastos_notariales =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += gastos_notariales
+                    if key == 'seguro_fac':
+                        seguro_fac =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += seguro_fac
+                    if key == 'telemetria':
+                        telemetria =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += telemetria
+                    if key == 'gestoria_alta':
+                        gestoria_alta =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += gestoria_alta
+                    if key == 'gestoria_seguro':
+                        gestoria_seguro =  tmp_complemento_renta * (cat_conceptos_factura[key]['media']/peso)
+                        suma_conceptos += gestoria_seguro
+                    n += 1
+                    if n == num_parametros_facturacion: 
+                        break
+            
             renta_leasing = renta_mensual_descuento - suma_conceptos
             
             tabla_facturacion = {
@@ -549,6 +598,7 @@ def cotizador_optimo():
             }
         elif tipo_respuesta == 6:
             response = {
+                "valor_inicial_arrenda": round(valor_inicial_arrenda, 2),
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
                 "descuento_mensual": round(descuento_mensual, 2),
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),
