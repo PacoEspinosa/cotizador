@@ -125,13 +125,13 @@
         </tr>
         <tr>
             <th><label for="monto_inversion">Depósito en garantia:</label></th>
-			<td><input type="checkbox" id="es_inversion" name="es_inversion" checked>
+			<td><input type="checkbox" id="es_inversion" name="es_inversion" {{ 'checked' if es_inversion else ''}}>
             <label for="es_inversion">Es inversión?</label></td>
             <td><input  type="text" class="format-number-commas" id="deposito_garantia" name="deposito_garantia" value="{{ input_lines.deposito_garantia }}" required></td>
         </tr>
         <tr>
             <th colspan="2"><label for="deposito_garantia">Fondo de Reserva (%):</label></th>
-            <td><input type="text" class="format-number-commas" id="fondo_reserva" name="fondo_reserva" value="{{ input_lines.fondo_reserva }}" required></td>
+            <td><input type="text" class="format-number-commas" id="fondo_reserva" name="fondo_reserva_mensual" value="{{ input_lines.fondo_reserva_mensual }}" required></td>
         </tr>
         <tr>
             <th colspan="2"><label for="tipo_activo">Tipo Activo:</label></th>
@@ -194,7 +194,7 @@
 				<h2>Tabla de Amortización</h2>
 				{% if api_response.tabla_amortizacion %}
 					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
-					<p><strong>Valor Inicial Arrendamiento:</strong> {{ "${:,.2f}".format(api_response.valor_inicial_arrenda) }}</p>
+					<p><strong>Valor Inicial Arrendamiento:</strong> {{ "${:,.2f}".format(api_response.monto_arrendamiento_siva) }}</p>
 					<table>
 						<thead>
 							<tr>

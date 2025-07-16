@@ -598,7 +598,7 @@ def cotizador_optimo():
             }
         elif tipo_respuesta == 6:
             response = {
-                "valor_inicial_arrenda": round(valor_inicial_arrenda, 2),
+                "monto_arrendamiento_siva": round(monto_arrendamiento_siva, 2),
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
                 "descuento_mensual": round(descuento_mensual, 2),
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),

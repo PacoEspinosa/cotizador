@@ -182,6 +182,7 @@ def cotizador():
     """
     api_response = None
     error_message = None
+    es_inversion = False
     payload = {}
 
     if request.method == 'POST':
@@ -197,16 +198,18 @@ def cotizador():
             if (residual_siva > 0 and tasa_residual_siva > 0):
                 error_message = "Se tomará el porcentaje del residual, solo debes proporcionar uno de los 2."
                 flash(error_message, 'success')
-                residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
+                residual_siva = round((tasa_residual_siva/100) * (valor_factura/1.16),2)
             if residual_siva == 0 and tasa_residual_siva > 0:
-                residual_siva = (tasa_residual_siva/100) * (valor_factura/1.16)
+                residual_siva = round((tasa_residual_siva/100) * (valor_factura/1.16),2)
                 
             es_inversion = request.form.get('es_inversion', 0)
             if es_inversion:
                 deposito_garantia = float(request.form.get('deposito_garantia', 0))
+                fondo_reserva = 0
             else:
                 fondo_reserva = float(request.form.get('deposito_garantia', 0))
-            fondo_reserva_mensual = float(request.form.get('fondo_reserva', 0))
+                deposito_garantia = 0
+            fondo_reserva_mensual = float(request.form.get('fondo_reserva_mensual', 0))
             tipo_activo = request.form.get('tipo_activo', 'Auto')
             tipo_vehiculo = request.form.get('tipo_vehiculo', 'G')
             tasa_comision_apertura = float(request.form.get('tasa_comision_apertura', 1))
@@ -263,7 +266,8 @@ def cotizador():
             flash(error_message, 'error')
 
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
-                           tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], input_lines = (payload if len(payload) > 0 else []))
+                           tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], 
+                           es_inversion = es_inversion, input_lines = (payload if len(payload) > 0 else []))
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)
