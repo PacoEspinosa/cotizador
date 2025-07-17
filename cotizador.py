@@ -193,14 +193,6 @@ def cotizador_optimo():
         iva_pago_inicial_total = pago_inicial_total*iva
         seguro_siva = seguro/(1+iva)
         iva_seguro =  seguro*iva
-        if deposito_garantia == 0:
-            if fondo_reserva > 0:
-                deposito_garantia = fondo_reserva
-            else:
-                if ((pago_inicial_total-seguro)/valor_siva) > precio_activo:
-                    deposito_garantia = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
-                else:
-                    deposito_garantia = 0
 
         iva_residual = residual_siva*iva
         valor_residual = residual_siva + iva_residual
@@ -279,7 +271,7 @@ def cotizador_optimo():
             total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado_leasing
             ahorro_isr_esperado_leasing = total_deducible_fiscal_leasing*isr
             total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
-            devolucion_deposito_garantia = (deposito_garantia if deposito_garantia == 0 else 0)
+            devolucion_deposito_garantia = (fondo_reserva if fondo_reserva != 0 else 0)
             beneficio_solo_leasing = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing + devolucion_deposito_garantia
             costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
             
@@ -561,7 +553,7 @@ def cotizador_optimo():
                 "Iva_renta_mensual_descuento": round(iva_renta_mensual_descuento,2),
                 "Monto_arrendamiento_siva": round(monto_arrendamiento_siva,2),
                 "Total_renta_mensual_descuento":  round(total_renta_mensual_descuento,2),
-                "Fondo_reserva": round(0,2)
+                "Fondo_reserva": round(fondo_reserva,2)
             }
 
 

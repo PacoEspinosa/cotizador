@@ -127,7 +127,7 @@
             <th><label for="monto_inversion">Depósito en garantia:</label></th>
 			<td><input type="checkbox" id="es_inversion" name="es_inversion" {{ 'checked' if es_inversion else ''}}>
             <label for="es_inversion">Es inversión?</label></td>
-            <td><input  type="text" class="format-number-commas" id="deposito_garantia" name="deposito_garantia" value="{{ input_lines.deposito_garantia }}" required></td>
+            <td><input  type="text" class="format-number-commas" id="deposito_garantia" name="deposito_garantia" value="{{ ( input_lines.deposito_garantia if es_inversion else input_lines.fondo_reserva )}}" required></td>
         </tr>
         <tr>
             <th colspan="2"><label for="deposito_garantia">Fondo de Reserva (%):</label></th>
@@ -291,7 +291,7 @@
 						<tbody>
 							{% for key, value in api_response.tabla_resumen.items() %}
 							<tr>
-								<td><strong>{{ key }}</strong></td>
+								<td><strong>{{ key[3:] }}</strong></td>
 								<td>{{ "${:,.2f}".format(value.Compra) }}</td>
 								<td>{{ "${:,.2f}".format(value.Credito) }}</td>
 								<td>{{ "${:,.2f}".format(value['Leasing + compra']) }}</td>
