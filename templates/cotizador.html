@@ -1,96 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<script>
-	document.addEventListener('DOMContentLoaded', () => {
-		// Función principal para formatear inputs
-		function formatInput(inputElement, formatType) {
-			let value = inputElement.value;
 
-			switch (formatType) {
-				case 'numberWithCommas':
-					// Eliminar cualquier caracter que no sea un dígito o un punto (para decimales)
-					value = value.replace(/[^\d.]/g, '');
-
-					// Separar la parte entera de la decimal si existe
-					let parts = value.split('.');
-					let integerPart = parts[0];
-					let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
-
-					// Añadir comas a la parte entera
-					integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-					inputElement.value = integerPart + decimalPart;
-					break;
-
-				case 'uppercase':
-					inputElement.value = value.toUpperCase();
-					break;
-
-				case 'noSpaces':
-					inputElement.value = value.replace(/\s/g, '');
-					break;
-
-				// Puedes añadir más casos de formato aquí
-				case 'maxLength5': // Ejemplo: limitar a 5 caracteres
-					if (value.length > 5) {
-						inputElement.value = value.substring(0, 5);
-					}
-					break;
-
-				default:
-					// No aplicar formato específico si no se reconoce el tipo
-					break;
-			}
-		}
-
-		// --- Aplicación de los formatos a los inputs ---
-
-		// Ejemplo 1: Inputs con formato de número con comas
-		// Asigna la clase 'format-number-commas' a los inputs que quieras formatear
-		document.querySelectorAll('.format-number-commas').forEach(input => {
-			// Se formatea en el evento 'input' para una actualización en tiempo real
-			input.addEventListener('input', () => formatInput(input, 'numberWithCommas'));
-			// También se formatea al cargar la página si ya tienen un valor inicial
-			formatInput(input, 'numberWithCommas');
-		});
-
-		// Ejemplo 2: Inputs que se convierten a mayúsculas
-		// Asigna la clase 'format-uppercase' a los inputs que quieras formatear
-		document.querySelectorAll('.format-uppercase').forEach(input => {
-			input.addEventListener('input', () => formatInput(input, 'uppercase'));
-			formatInput(input, 'uppercase');
-		});
-
-		// Ejemplo 3: Inputs sin espacios
-		// Asigna la clase 'format-no-spaces' a los inputs que quieras formatear
-		document.querySelectorAll('.format-no-spaces').forEach(input => {
-			input.addEventListener('input', () => formatInput(input, 'noSpaces'));
-			formatInput(input, 'noSpaces');
-		});
-
-		// Ejemplo 4: Input con longitud máxima de 5 caracteres
-		// Asigna la clase 'format-max-length-5'
-		document.querySelectorAll('.format-max-length-5').forEach(input => {
-			input.addEventListener('input', () => formatInput(input, 'maxLength5'));
-			formatInput(input, 'maxLength5');
-		});
-
-		// --- Limpieza antes de enviar el formulario (opcional) ---
-		// Si necesitas que los números se envíen sin comas al servidor
-		// puedes añadir un manejador para el evento 'submit' del formulario.
-		const form = document.querySelector('form'); // O selecciona tu formulario por ID/clase
-		if (form) {
-			form.addEventListener('submit', () => {
-				document.querySelectorAll('.format-number-commas').forEach(input => {
-					// Eliminar las comas antes de enviar el formulario
-					input.value = input.value.replace(/,/g, '');
-				});
-				// Puedes añadir más lógica de limpieza para otros tipos de formato si es necesario
-			});
-		}
-	});
-	</script>
     <h1>Cotizador</h1>
     <form method="POST">
 	<table style="width:100%">
@@ -124,14 +35,14 @@
             <td><input type="number" step="0.01" id="tasa_residual_siva" name="tasa_residual_siva" value="0" required></td>
         </tr>
         <tr>
-            <th><label for="monto_inversion">Depósito en garantia:</label></th>
-			<td><input type="checkbox" id="es_inversion" name="es_inversion" {{ 'checked' if es_inversion else ''}}>
+            <th><label for="deposito_garantia">Depósito en garantia ($):</label></th>
+			<td><input type="checkbox" id="es_inversion" name="es_inversion" {{ 'checked' if input_lines.es_inversion else ''}}>
             <label for="es_inversion">Es inversión?</label></td>
-            <td><input  type="text" class="format-number-commas" id="deposito_garantia" name="deposito_garantia" value="{{ ( input_lines.deposito_garantia if es_inversion else input_lines.fondo_reserva )}}" required></td>
+            <td><input  type="text" class="format-number-commas" id="deposito_garantia" name="deposito_garantia" value="{{ ( input_lines.deposito_garantia  if api_response else 0 )}}" required></td>
         </tr>
         <tr>
-            <th colspan="2"><label for="deposito_garantia">Fondo de Reserva (%):</label></th>
-            <td><input type="text" class="format-number-commas" id="fondo_reserva" name="fondo_reserva_mensual" value="{{ input_lines.fondo_reserva_mensual }}" required></td>
+            <th colspan="2"><label for="tasa_fondo_reserva">Fondo de Reserva (%):</label></th>
+            <td><input type="number" step="0.01" id="tasa_fondo_reserva" name="tasa_fondo_reserva" value="{{ ( input_lines.tasa_fondo_reserva  if api_response else 0 )}}" required></td>
         </tr>
         <tr>
             <th colspan="2"><label for="tipo_activo">Tipo Activo:</label></th>
@@ -158,14 +69,14 @@
         <tr>
             <th rowspan="2">Tasa Interés Anual:</th>
             <th><label for="tasa_interes_anual">Tasa Interés (%):</label></th>
-			<td><input type="number" step="0.01" id="tasa_interes_anual" name="tasa_interes_anual" value="{{ input_lines.tasa_interes_anual }}" required></td>
+			<td><input type="number" step="0.01" id="tasa_interes_anual" name="tasa_interes_anual" value="{{ input_lines.tasa_interes_anual if api_response else 0 }}" required></td>
         </tr>
         <tr>
             <th><label for="plan_tasa">Plan:</label></th>
 			<td><select name="plan_tasa" id="plan_tasa" >
-			<option value="">No Seleccionado</option>
+			<option value="" >No Seleccionado</option>
             {% for key, value in tbl_planes.items() %}
-                <option value="{{ key }}">{{ key }}</option>
+                <option value="{{ key }}" {{ 'Selected' if key == input_lines.plan_tasa else ''}}>{{ key }}</option>
             {% endfor %}
 			</select></td>
         </tr>
@@ -226,8 +137,9 @@
 				<h2>Tabla de Facturación</h2>
 				{% if api_response.tabla_facturacion %}
 					<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_calculada) }}</p>
-					<p><strong>Descuento Mensual:</strong> {{ "${:,.2f}".format(api_response.descuento_mensual) }}</p>
-					<p><strong>Renta Mensual Descuento:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_descuento) }}</p>
+					<p><strong>Descuento Mensual (-):</strong> {{ "${:,.2f}".format(api_response.descuento_mensual) }}</p>
+					<p><strong>Fondo de Reserva (+):</strong> {{ "${:,.2f}".format(api_response.fondo_reserva) }}</p>
+					<p><strong>Renta Mensual Facturada:</strong> {{ "${:,.2f}".format(api_response.renta_mensual_facturada) }}</p>
 					<table>
 						<thead>
 							<tr>

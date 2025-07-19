@@ -189,6 +189,93 @@
         }
 		[data-slots] { font-family: monospace }
 		</style>
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Función principal para formatear inputs
+		function formatInput(inputElement, formatType) {
+			let value = inputElement.value;
+
+			switch (formatType) {
+				case 'numberWithCommas':
+					// Eliminar cualquier caracter que no sea un dígito o un punto (para decimales)
+					value = value.replace(/[^\d.]/g, '');
+
+					// Separar la parte entera de la decimal si existe
+					let parts = value.split('.');
+					let integerPart = parts[0];
+					let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+					// Añadir comas a la parte entera
+					integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+					inputElement.value = integerPart + decimalPart;
+					break;
+
+				case 'uppercase':
+					inputElement.value = value.toUpperCase();
+					break;
+
+				case 'noSpaces':
+					inputElement.value = value.replace(/\s/g, '');
+					break;
+
+				// Puedes añadir más casos de formato aquí
+				case 'maxLength5': // Ejemplo: limitar a 5 caracteres
+					if (value.length > 5) {
+						inputElement.value = value.substring(0, 5);
+					}
+					break;
+
+				default:
+					// No aplicar formato específico si no se reconoce el tipo
+					break;
+			}
+		}
+
+		// --- Aplicación de los formatos a los inputs ---
+
+		// Ejemplo 1: Inputs con formato de número con comas
+		// Asigna la clase 'format-number-commas' a los inputs que quieras formatear
+		document.querySelectorAll('.format-number-commas').forEach(input => {
+			// Se formatea en el evento 'input' para una actualización en tiempo real
+			input.addEventListener('input', () => formatInput(input, 'numberWithCommas'));
+			// También se formatea al cargar la página si ya tienen un valor inicial
+			formatInput(input, 'numberWithCommas');
+		});
+
+		// Ejemplo 2: Inputs que se convierten a mayúsculas
+		// Asigna la clase 'format-uppercase' a los inputs que quieras formatear
+		document.querySelectorAll('.format-uppercase').forEach(input => {
+			input.addEventListener('input', () => formatInput(input, 'uppercase'));
+			formatInput(input, 'uppercase');
+		});
+
+		// Ejemplo 3: Inputs sin espacios
+		// Asigna la clase 'format-no-spaces' a los inputs que quieras formatear
+		document.querySelectorAll('.format-no-spaces').forEach(input => {
+			input.addEventListener('input', () => formatInput(input, 'noSpaces'));
+			formatInput(input, 'noSpaces');
+		});
+
+		// Ejemplo 4: Input con longitud máxima de 5 caracteres
+		// Asigna la clase 'format-max-length-5'
+		document.querySelectorAll('.format-max-length-5').forEach(input => {
+			input.addEventListener('input', () => formatInput(input, 'maxLength5'));
+			formatInput(input, 'maxLength5');
+		});
+
+		// --- Limpieza antes de enviar el formulario (opcional) --
+		const form = document.querySelector('form'); // O selecciona tu formulario por ID/clase
+		if (form) {
+			form.addEventListener('submit', () => {
+				document.querySelectorAll('.format-number-commas').forEach(input => {
+					// Eliminar las comas antes de enviar el formulario
+					input.value = input.value.replace(/,/g, '');
+				});
+			});
+		}
+	});
+	</script>
 </head>
 <body>
     <div class="sidebar">

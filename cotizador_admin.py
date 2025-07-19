@@ -126,6 +126,7 @@ def identificar_ofertas():
     Permite al usuario ingresar parámetros para calcular una tasa de interés.
     """
     tasa_interes = None
+    es_credito = False
     valor_factura = 0.0
     plazo = 0
     enganche_c_iva = 0.0
@@ -140,7 +141,7 @@ def identificar_ofertas():
             valor_residual_s_iva = float(request.form['valor_residual_s_iva'])
             pago_mensual = float(request.form['pago_mensual'])
             comision_apertura = float(request.form['comision_apertura'])
-            es_credito = request.form.get('es_credito') == 'on'
+            es_credito = request.form.get('es_credito')
 
             text = open(CONFIG_FILE)
             config = json.loads(text.read())
@@ -172,7 +173,7 @@ def identificar_ofertas():
 
     return render_template('identificar_ofertas.html', tasa_interes=tasa_interes, valor_factura=valor_factura, plazo=plazo,
                            enganche_c_iva=enganche_c_iva, pago_mensual=pago_mensual, comision_apertura=comision_apertura,
-                           valor_residual_s_iva=valor_residual_s_iva)
+                           valor_residual_s_iva=valor_residual_s_iva, es_credito = es_credito)
 
 
 @app.route('/cotizador', methods=['GET', 'POST'])
@@ -180,6 +181,7 @@ def cotizador():
     """
     Realiza una consulta a la API externa y muestra el resultado.
     """
+    tasa_interes_anual = 0
     api_response = None
     error_message = None
     es_inversion = False
@@ -201,24 +203,14 @@ def cotizador():
                 residual_siva = round((tasa_residual_siva/100) * (valor_factura/1.16),2)
             if residual_siva == 0 and tasa_residual_siva > 0:
                 residual_siva = round((tasa_residual_siva/100) * (valor_factura/1.16),2)
-                
             es_inversion = request.form.get('es_inversion', False)
-            if es_inversion:
-                deposito_garantia = float(request.form.get('deposito_garantia', 0))
-                fondo_reserva = 0
-            else:
-                fondo_reserva = float(request.form.get('deposito_garantia', 0))
-                deposito_garantia = 0
-            
-            fondo_reserva_mensual = float(request.form.get('fondo_reserva_mensual', 0))
+            deposito_garantia = float(request.form.get('deposito_garantia', 0))
+            tasa_fondo_reserva = float(request.form.get('tasa_fondo_reserva', 0))
             tipo_activo = request.form.get('tipo_activo', 'Auto')
             tipo_vehiculo = request.form.get('tipo_vehiculo', 'G')
             tasa_comision_apertura = float(request.form.get('tasa_comision_apertura', 1))
             tasa_interes_anual = float(request.form.get('tasa_interes_anual', 0))
             plan_tasa = request.form.get('plan_tasa')
-            if tasa_interes_anual == 0 and plan_tasa != '':
-                tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
-            
             num_parametros_facturacion = int(request.form.get('num_parametros_facturacion', 10))
             tipo_respuesta = int(6)
             fuente_consulta = 1
@@ -231,7 +223,8 @@ def cotizador():
                 "pago_inicial_total": pago_inicial_total,
                 "residual_siva": residual_siva,
                 "deposito_garantia": deposito_garantia,
-                "fondo_reserva": fondo_reserva,
+                "es_inversion": es_inversion,
+                "tasa_fondo_reserva": tasa_fondo_reserva,
                 "tipo_activo": tipo_activo,
                 "tipo_vehiculo": tipo_vehiculo,
                 "tasa_comision_apertura": tasa_comision_apertura,
@@ -268,7 +261,7 @@ def cotizador():
 
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
                            tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], 
-                           es_inversion = es_inversion, input_lines = (payload if len(payload) > 0 else []))
+                           input_lines = (payload if len(payload) > 0 else []))
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)

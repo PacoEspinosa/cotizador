@@ -118,7 +118,8 @@ def cotizador_optimo():
         pago_inicial_total = data['pago_inicial_total']
         residual_siva = data['residual_siva']
         deposito_garantia = data['deposito_garantia']
-        fondo_reserva = data['fondo_reserva']
+        es_inversion = data['es_inversion']
+        tasa_fondo_reserva = data['tasa_fondo_reserva']
         tipo_activo =  data['tipo_activo']
         tipo_vehiculo =  data['tipo_vehiculo']
         tasa_comision_apertura = data['tasa_comision_apertura']
@@ -130,15 +131,13 @@ def cotizador_optimo():
 
         # [[[[[[[[[[[   Validaciones básicas   ]]]]]]]]]]]
         if not all(isinstance(arg, (int, float)) for arg in [valor_factura,accesorios,plazo_meses, seguro, pago_inicial_total,
-                                                             residual_siva,deposito_garantia,fondo_reserva,tasa_comision_apertura,
+                                                             residual_siva,deposito_garantia,tasa_fondo_reserva,tasa_comision_apertura,
                                                              tasa_interes_anual,tipo_respuesta]):
             return jsonify({"error": "Todos los campos deben ser numeros."}), 400
         if plazo_meses <= 0 or valor_factura <= 0 or tipo_respuesta <= 0:
             return jsonify({"error": "Plazo, monto inicial y tipo respuesta deben ser mayores que cero."}), 400
         if tipo_respuesta <= 0 or tipo_respuesta > 6:
             return jsonify({"error": "Tipo_respuesta solo puede estar entre 1 y 6."}), 400
-        if deposito_garantia > 0 and fondo_reserva > 0:
-            return jsonify({"error": "Solo debe proporcionar uno de los conceptos, deposito_garantia o fondo_reserva."}), 400
         if pago_inicial_total < (seguro + deposito_garantia):
             return jsonify({"error": "El pago inicial debe ser mayor a la suma del seguro y el deposito en garantia."}), 400
 
@@ -170,8 +169,10 @@ def cotizador_optimo():
         if plan_tasa not in config["catalogo_tasa_anual"]:
             if plan_tasa != '':
                 return jsonify({"error": "plan_tasa:Valor fuera de catalogo."}), 400
-        if (plan_tasa != '' and tasa_interes_anual > 0) or (plan_tasa == '' and tasa_interes_anual == 0):
+        if (plan_tasa != '' and tasa_interes_anual > 0):
             return jsonify({"error": "Solo debes proporcionar uno de los dos, Plan del leasing o la tasa de interes anual."}), 400
+        elif (plan_tasa == '' and tasa_interes_anual == 0):
+            return jsonify({"error": "Debes proporcionar alguno de los dos, Plan del leasing o la tasa de interes anual."}), 400
         elif plan_tasa != '':
             tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
 
@@ -223,7 +224,7 @@ def cotizador_optimo():
         if monto_arrendamiento<0:
             return jsonify({"error": "Revisar valor_factura, pago_inicial, deposito_garantia ó seguro, tienen algún valor erróneo."}), 400
         if valor_inicial_arrenda < 0 or valor_inicial_arrenda > (valor_siva*precio_activo):
-            return jsonify({"error": "Revisar fondo_reserva, pago_inicial, deposito_garantia ó seguro, tienen algún valor erróneo."}), 400
+            return jsonify({"error": "Revisar pago_inicial, deposito_garantia ó seguro, tienen algún valor erróneo."}), 400
         if fuente_consulta == 0:
             if tipo_activo == 'Bicicleta':
                 if tasa_residual < cat_valor_residual[tipo_activo]["min"] or tasa_residual > cat_valor_residual[tipo_activo]["max"]:
@@ -247,12 +248,14 @@ def cotizador_optimo():
             renta_mensual_calculada = (valor_inicial_arrenda - residual_siva) / plazo_meses
         else:
             renta_mensual_calculada = nf.pmt(tasa_interes_mensual,plazo_meses,-monto_arrendamiento_siva,residual_siva)
+        fondo_reserva = renta_mensual_calculada*(tasa_fondo_reserva/100)
         iva_renta_mensual_calculada = renta_mensual_calculada*iva
         total_renta_mensual_calculada = renta_mensual_calculada+iva_renta_mensual_calculada
-        descuento_mensual = (0 if deposito_garantia == 0 else deposito_garantia*(tasa_descuento/12))
+        descuento_mensual = (deposito_garantia*(tasa_descuento/12) if es_inversion else 0)
         renta_mensual_descuento = renta_mensual_calculada-descuento_mensual
         iva_renta_mensual_descuento = renta_mensual_descuento*iva
-        total_renta_mensual_descuento = renta_mensual_descuento+iva_renta_mensual_descuento
+        renta_mensual_facturada = round(renta_mensual_descuento,2) + round(fondo_reserva,2)
+        total_renta_mensual_descuento = round(renta_mensual_descuento,2)+round(iva_renta_mensual_descuento,2) + fondo_reserva
         renta_mensual_deducible = cat_base_deducible[tipo_vehiculo]
         if (renta_mensual_descuento*deducibilidad)>renta_mensual_deducible:
             complemento_renta = (renta_mensual_descuento*deducibilidad-renta_mensual_deducible)
@@ -265,13 +268,13 @@ def cotizador_optimo():
             #**** Seccion Tabla resumen ****
             #[solo_leasing]
             total_deducible_fiscal_leasing = renta_mensual_descuento*deducibilidad*plazo_meses
-            devolucion_inversion_solo_leasing = deposito_garantia
+            devolucion_inversion_solo_leasing = (deposito_garantia if es_inversion else 0)
             rendimiento = plazo_meses*descuento_mensual
             monto_pagado_leasing = pago_inicial_total - deposito_garantia
             total_pagado_plan_solo_leasing = plazo_meses*renta_mensual_descuento + monto_pagado_leasing
             ahorro_isr_esperado_leasing = total_deducible_fiscal_leasing*isr
             total_iva_acreditable_leasing = plazo_meses*iva_renta_mensual_descuento*deducibilidad
-            devolucion_deposito_garantia = (fondo_reserva if fondo_reserva != 0 else 0)
+            devolucion_deposito_garantia = (0 if es_inversion else deposito_garantia) + (plazo_meses * fondo_reserva)
             beneficio_solo_leasing = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing + devolucion_deposito_garantia
             costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
             
@@ -447,7 +450,7 @@ def cotizador_optimo():
                     if n == num_parametros_facturacion: 
                         break
             
-            renta_leasing = renta_mensual_descuento - suma_conceptos
+            renta_leasing = renta_mensual_descuento - suma_conceptos + fondo_reserva
             
             tabla_facturacion = {
                 "Gastos_administracion": round(g_administracion,2),
@@ -475,7 +478,7 @@ def cotizador_optimo():
                 saldo_pendiente -= capital_pagado
     
                 # Asegurarse de que el último saldo no sea negativo debido a errores de punto flotante
-                if mes == plazo_meses:
+                if mes == plazo_meses and residual_siva == 0:
                     capital_pagado += saldo_pendiente  # Ajustar para que el saldo sea 0 al final
                     saldo_pendiente = 0
     
@@ -495,22 +498,26 @@ def cotizador_optimo():
         if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
            
             #Escenario 12 meses
-            renta_calculada_12M = nf.pmt(tasa_interes_mensual,12,-monto_arrendamiento_siva,residual_siva)
+            residual_siva_12M = (cat_valor_residual['12']["max"]/100)*valor_siva
+            renta_calculada_12M = nf.pmt(tasa_interes_mensual,12,-monto_arrendamiento_siva,residual_siva_12M)
+            fondo_reserva_12M = renta_calculada_12M * (tasa_fondo_reserva/100)
             renta_descuento_12M = renta_calculada_12M - descuento_mensual
             iva_renta_descuento_12M = renta_descuento_12M * iva
-            total_renta_12M =(renta_descuento_12M + iva_renta_descuento_12M)
+            total_renta_12M =(renta_descuento_12M + iva_renta_descuento_12M + fondo_reserva_12M)
             tabla_12M = {
                 "Renta_calculada": round(renta_calculada_12M,2),
                 "Descuento_mensual": round(descuento_mensual,2),
                 "Renta_descuento": round(renta_descuento_12M,2),
                 "IVA_renta": round(iva_renta_descuento_12M,2),
-                "Fondo_reserva": round(0,2),
+                "Fondo_reserva": round(fondo_reserva_12M,2),
                 "Renta_mensual_total": round(total_renta_12M,2),
-                "Valor_residual": round(residual_siva,2),
+                "Valor_residual": round(residual_siva_12M,2),
             }
 
             #Escenario 24 meses
-            renta_calculada_24M = nf.pmt(tasa_interes_mensual,24,-monto_arrendamiento_siva,residual_siva)
+            residual_siva_24M = (cat_valor_residual['24']["max"]/100)*valor_siva
+            renta_calculada_24M = nf.pmt(tasa_interes_mensual,24,-monto_arrendamiento_siva,residual_siva_24M)
+            fondo_reserva_24M = renta_calculada_24M * (tasa_fondo_reserva/100)
             renta_descuento_24M = renta_calculada_24M - descuento_mensual
             iva_renta_descuento_24M = renta_descuento_24M * iva
             total_renta_24M =(renta_descuento_24M + iva_renta_descuento_24M)
@@ -519,13 +526,15 @@ def cotizador_optimo():
                 "Descuento_mensual": round(descuento_mensual,2),
                 "Renta_descuento": round(renta_descuento_24M,2),
                 "IVA_renta": round(iva_renta_descuento_24M,2),
-                "Fondo_reserva": round(0,2),
+                "Fondo_reserva": round(fondo_reserva_24M,2),
                 "Renta_mensual_total": round(total_renta_24M,2),
-                "Valor_residual": round(residual_siva,2),
+                "Valor_residual": round(residual_siva_24M,2),
             }
 
             #Escenario 36 meses
-            renta_calculada_36M = nf.pmt(tasa_interes_mensual,36,-monto_arrendamiento_siva,residual_siva)
+            residual_siva_36M = (cat_valor_residual['36']["max"]/100)*valor_siva
+            renta_calculada_36M = nf.pmt(tasa_interes_mensual,36,-monto_arrendamiento_siva,residual_siva_36M)
+            fondo_reserva_36M = renta_calculada_36M * (tasa_fondo_reserva/100)
             renta_descuento_36M = renta_calculada_36M - descuento_mensual
             iva_renta_descuento_36M = renta_descuento_36M * iva
             total_renta_36M =(renta_descuento_36M + iva_renta_descuento_36M)
@@ -534,9 +543,9 @@ def cotizador_optimo():
                 "Descuento_mensual": round(descuento_mensual,2),
                 "Renta_descuento": round(renta_descuento_36M,2),
                 "IVA_renta": round(iva_renta_descuento_36M,2),
-                "Fondo_reserva": round(0,2),
+                "Fondo_reserva": round(fondo_reserva_36M,2),
                 "Renta_mensual_total": round(total_renta_36M,2),
-                "Valor_residual": round(residual_siva,2),
+                "Valor_residual": round(residual_siva_36M,2),
             }
             
             tabla_cotizacion = {
@@ -593,7 +602,9 @@ def cotizador_optimo():
                 "monto_arrendamiento_siva": round(monto_arrendamiento_siva, 2),
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
                 "descuento_mensual": round(descuento_mensual, 2),
+                "fondo_reserva": round(fondo_reserva, 2),
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),
+                "renta_mensual_facturada": round(renta_mensual_facturada, 2),
                 "pago_credito_calculada": round(pago_credito, 2),
                 "tabla_amortizacion": tabla_amortizacion,
                 "tabla_resumen": tabla_resumen,
