@@ -248,12 +248,12 @@ def cotizador_optimo():
             renta_mensual_calculada = (valor_inicial_arrenda - residual_siva) / plazo_meses
         else:
             renta_mensual_calculada = nf.pmt(tasa_interes_mensual,plazo_meses,-monto_arrendamiento_siva,residual_siva)
-        fondo_reserva = renta_mensual_calculada*(tasa_fondo_reserva/100)
         iva_renta_mensual_calculada = renta_mensual_calculada*iva
         total_renta_mensual_calculada = renta_mensual_calculada+iva_renta_mensual_calculada
         descuento_mensual = (deposito_garantia*(tasa_descuento/12) if es_inversion else 0)
         renta_mensual_descuento = renta_mensual_calculada-descuento_mensual
         iva_renta_mensual_descuento = renta_mensual_descuento*iva
+        fondo_reserva = renta_mensual_descuento*(tasa_fondo_reserva/100)
         renta_mensual_facturada = round(renta_mensual_descuento,2) + round(fondo_reserva,2)
         total_renta_mensual_descuento = round(renta_mensual_descuento,2)+round(iva_renta_mensual_descuento,2) + fondo_reserva
         renta_mensual_deducible = cat_base_deducible[tipo_vehiculo]
@@ -624,6 +624,7 @@ def cotizador_optimo():
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
                 "descuento_mensual": round(descuento_mensual, 2),
                 "base_deducible":  round(renta_mensual_deducible, 2),
+                "fondo_reserva": round(fondo_reserva, 2),
                 "tabla_facturacion": tabla_facturacion
             }
         elif tipo_respuesta == 4:
