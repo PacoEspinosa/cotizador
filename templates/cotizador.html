@@ -96,6 +96,7 @@
 
 			<div class="tabs">
 				<button class="tablinks active" onclick="openTab(event, 'resumen')">Tabla de Resumen</button>
+				<button class="tablinks" onclick="openTab(event, 'interna')">Tabla Interna</button>
 				<button class="tablinks" onclick="openTab(event, 'amortizacion')">Tabla de Amortización</button>
 				<button class="tablinks" onclick="openTab(event, 'facturacion')">Tabla de Facturación</button>
 				<button class="tablinks" onclick="openTab(event, 'cotizacion')">Datos de Cotización</button>
@@ -214,6 +215,42 @@
 					</table>
 				{% else %}
 					<p>No hay datos disponibles para la Tabla de Resumen.</p>
+				{% endif %}
+			</div>
+
+			<div id="interna" class="tabcontent">
+				<h2>Tabla Interna</h2>
+				{% if api_response.tabla_resumen %}
+					<table>
+						<thead>
+							<tr>
+								<th>Año</th>
+								<th>Tasa real</th>
+								<th>Tasa efectiva</th>
+								<th>Ingresos Capital</th>
+								<th>Ingresos Intereses</th>
+								<th>Pago Residual</th>
+								<th>Capital Vigente</th>
+								<th>Pago a Capital</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for key, value in api_response.tabla_interna.items() %}
+							<tr>
+								<td><strong>{{ key }}</strong></td>
+								<td>{{ "{:,.2f}".format(value.tasa_real) }}</td>
+								<td>{{ "{:,.2f}".format(value.tasa_efectiva) }}</td>
+								<td>{{ "${:,.2f}".format(value.ingresos_capital) }}</td>
+								<td>{{ "${:,.2f}".format(value.ingresos_intereses) }}</td>
+								<td>{{ "${:,.2f}".format(value.pago_residual) }}</td>
+								<td>{{ "${:,.2f}".format(value.capital_vigente) }}</td>
+								<td>{{ "${:,.2f}".format(value.pago_capital) }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				{% else %}
+					<p>No hay datos disponibles para la Tabla Interna.</p>
 				{% endif %}
 			</div>
 

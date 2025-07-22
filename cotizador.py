@@ -325,7 +325,7 @@ def cotizador_optimo():
                     "Compra": round(0, 2)  
                     },
                 "04.Valor Residual":{
-                    "Solo Leasing": round(residual_siva, 2),
+                    "Solo Leasing": round(0, 2),
                     "Leasing + compra": round(residual_siva, 2),
                     "Credito": round(0, 2),
                     "Compra": round(0, 2)  
@@ -468,7 +468,7 @@ def cotizador_optimo():
             num_parametros_facturacion = num_parametros_facturacion
 
         #****************+   Generar tabla de amortización   **********************
-        if (tipo_respuesta == 1 or tipo_respuesta == 6):
+        if (tipo_respuesta == 1 or tipo_respuesta == 6 or tipo_respuesta == 4):
             tabla_amortizacion = []
             saldo_pendiente = monto_arrendamiento_siva
     
@@ -492,7 +492,47 @@ def cotizador_optimo():
 
         #**************   Tabla de Interna   ***********************
         if (tipo_respuesta == 4 or tipo_respuesta == 6 ):
+            ingresos_capital = 0
+            ingresos_intereses = 0
+            tasa_periodo = 0
+            capital_vigente = 0
             tabla_interna = {}
+            for mes in tabla_amortizacion:
+                if mes['mes']%12 == 1:
+                    capital_vigente = (mes['saldo_pendiente']+mes['capital_pagado'])
+                ingresos_capital += mes['capital_pagado']
+                ingresos_intereses += mes['interes_pagado']
+                tasa_periodo += ((mes['interes_pagado']- descuento_mensual)/(mes['saldo_pendiente']+mes['renta_mensual_calculada']))*12
+                if mes['mes'] % 12 == 0:
+                    tasa_real = (tasa_periodo/12)*100
+                    tasa_efectiva = (ingresos_intereses/capital_vigente*100)
+                    pago_residual = (0 if mes['mes'] != plazo_meses else residual_siva)
+                    tabla_interna["Año" + str(int(mes['mes']/12))] = {
+                        "tasa_real": tasa_real,
+                        "tasa_efectiva": tasa_efectiva,
+                        "ingresos_capital": ingresos_capital,
+                        "ingresos_intereses": ingresos_intereses,
+                        "pago_residual": pago_residual,
+                        "capital_vigente": capital_vigente,
+                        "pago_capital": ingresos_capital + pago_residual
+                        }
+                    ingresos_capital = 0
+                    ingresos_intereses = 0
+                    tasa_periodo = 0
+        
+            if len(tabla_amortizacion) % 12 != 0:
+                tasa_real = (tasa_periodo/(len(tabla_amortizacion)%12))*100
+                tasa_efectiva = (ingresos_intereses/capital_vigente)*100
+                pago_residual = (0 if mes['mes'] != plazo_meses else residual_siva)
+                tabla_interna["Año" + str(int(len(tabla_amortizacion)/12)+1)] = {
+                    "tasa_real": tasa_real,
+                    "tasa_efectiva": tasa_efectiva,
+                    "ingresos_capital": ingresos_capital,
+                    "ingresos_intereses": ingresos_intereses,
+                    "pago_residual": pago_residual,
+                    "capital_vigente": capital_vigente,
+                    "pago_capital": ingresos_capital + pago_residual
+                    }
             
         #**************   Tabla de cotizacion   **********************
         if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
@@ -609,7 +649,11 @@ def cotizador_optimo():
                 "tabla_amortizacion": tabla_amortizacion,
                 "tabla_resumen": tabla_resumen,
                 "tabla_cotizacion": tabla_cotizacion,
-                "tabla_facturacion": tabla_facturacion
+                "tabla_12M": tabla_12M,
+                "tabla_24M": tabla_24M,
+                "tabla_36M": tabla_36M,
+                "tabla_facturacion": tabla_facturacion,
+                "tabla_interna": tabla_interna
             }
         if fuente_consulta == 1 and admin_message != '':
             response["admin_message"] = admin_message
