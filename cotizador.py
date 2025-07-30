@@ -19,6 +19,27 @@ API_KEYS = {
 CONFIG_FILE = 'config_app.info'
 
 # --- Funciones  ---
+def calculo_escenario (escenario_meses, cat_otros_gastos, cat_valor_residual, variables_escenario):
+    otros_gastos_ciclo = cat_otros_gastos[str(escenario_meses)] * (1 + variables_escenario['iva'])
+    comision_apertura_ciclo = (variables_escenario['valor_factura'] + variables_escenario['accesorios'] + otros_gastos_ciclo - variables_escenario['valor_inicial_arrenda'])*(variables_escenario['tasa_comision_apertura']/100)
+    monto_arrendamiento_ciclo = (variables_escenario['valor_factura'] + variables_escenario['accesorios'] + otros_gastos_ciclo + comision_apertura_ciclo - variables_escenario['valor_inicial_arrenda'])
+    monto_arrendamiento_siva_ciclo = monto_arrendamiento_ciclo/(1 + variables_escenario['iva'])
+    residual_siva_ciclo = (cat_valor_residual[str(escenario_meses)]["max"]/100)*variables_escenario['valor_siva']
+    renta_calculada_ciclo = nf.pmt(variables_escenario['tasa_interes_mensual'],escenario_meses,-monto_arrendamiento_siva_ciclo,residual_siva_ciclo)
+    renta_descuento_ciclo = renta_calculada_ciclo - variables_escenario['descuento_mensual']
+    iva_renta_descuento_ciclo = renta_descuento_ciclo * variables_escenario['iva']
+    fondo_reserva_ciclo = renta_descuento_ciclo * (variables_escenario['tasa_fondo_reserva']/100)
+    total_renta_ciclo =(renta_descuento_ciclo + iva_renta_descuento_ciclo + fondo_reserva_ciclo)
+    tabla_escenario = {
+        "Renta_calculada": round(renta_calculada_ciclo,2),
+        "Descuento_mensual": round(variables_escenario['descuento_mensual'],2),
+        "Renta_descuento": round(renta_descuento_ciclo,2),
+        "IVA_renta": round(iva_renta_descuento_ciclo,2),
+        "Fondo_reserva": round(fondo_reserva_ciclo,2),
+        "Renta_mensual_total": round(total_renta_ciclo,2),
+        "Valor_residual": round(residual_siva_ciclo,2),
+    }
+    return tabla_escenario
 # Middleware o decorador para verificación de API Key
 def require_api_key(func):
     def wrapper(*args, **kwargs):
@@ -537,56 +558,26 @@ def cotizador_optimo():
         #**************   Tabla de cotizacion   **********************
         if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
            
+            variables_escenario = {
+                "iva": iva,
+                "valor_factura": valor_factura,
+                "accesorios": accesorios,
+                "valor_inicial_arrenda": valor_inicial_arrenda,
+                "tasa_comision_apertura": tasa_comision_apertura,
+                "valor_siva": valor_siva,
+                "tasa_interes_mensual": tasa_interes_mensual,
+                "tasa_fondo_reserva": tasa_fondo_reserva,
+                "descuento_mensual": descuento_mensual
+                }
             #Escenario 12 meses
-            residual_siva_12M = (cat_valor_residual['12']["max"]/100)*valor_siva
-            renta_calculada_12M = nf.pmt(tasa_interes_mensual,12,-monto_arrendamiento_siva,residual_siva_12M)
-            fondo_reserva_12M = renta_calculada_12M * (tasa_fondo_reserva/100)
-            renta_descuento_12M = renta_calculada_12M - descuento_mensual
-            iva_renta_descuento_12M = renta_descuento_12M * iva
-            total_renta_12M =(renta_descuento_12M + iva_renta_descuento_12M + fondo_reserva_12M)
-            tabla_12M = {
-                "Renta_calculada": round(renta_calculada_12M,2),
-                "Descuento_mensual": round(descuento_mensual,2),
-                "Renta_descuento": round(renta_descuento_12M,2),
-                "IVA_renta": round(iva_renta_descuento_12M,2),
-                "Fondo_reserva": round(fondo_reserva_12M,2),
-                "Renta_mensual_total": round(total_renta_12M,2),
-                "Valor_residual": round(residual_siva_12M,2),
-            }
+            tabla_12M = calculo_escenario (12, cat_otros_gastos, cat_valor_residual, variables_escenario)
 
             #Escenario 24 meses
-            residual_siva_24M = (cat_valor_residual['24']["max"]/100)*valor_siva
-            renta_calculada_24M = nf.pmt(tasa_interes_mensual,24,-monto_arrendamiento_siva,residual_siva_24M)
-            fondo_reserva_24M = renta_calculada_24M * (tasa_fondo_reserva/100)
-            renta_descuento_24M = renta_calculada_24M - descuento_mensual
-            iva_renta_descuento_24M = renta_descuento_24M * iva
-            total_renta_24M =(renta_descuento_24M + iva_renta_descuento_24M)
-            tabla_24M = {
-                "Renta_calculada": round(renta_calculada_24M,2),
-                "Descuento_mensual": round(descuento_mensual,2),
-                "Renta_descuento": round(renta_descuento_24M,2),
-                "IVA_renta": round(iva_renta_descuento_24M,2),
-                "Fondo_reserva": round(fondo_reserva_24M,2),
-                "Renta_mensual_total": round(total_renta_24M,2),
-                "Valor_residual": round(residual_siva_24M,2),
-            }
+            tabla_24M = calculo_escenario (24, cat_otros_gastos, cat_valor_residual, variables_escenario)
 
             #Escenario 36 meses
-            residual_siva_36M = (cat_valor_residual['36']["max"]/100)*valor_siva
-            renta_calculada_36M = nf.pmt(tasa_interes_mensual,36,-monto_arrendamiento_siva,residual_siva_36M)
-            fondo_reserva_36M = renta_calculada_36M * (tasa_fondo_reserva/100)
-            renta_descuento_36M = renta_calculada_36M - descuento_mensual
-            iva_renta_descuento_36M = renta_descuento_36M * iva
-            total_renta_36M =(renta_descuento_36M + iva_renta_descuento_36M)
-            tabla_36M = {
-                "Renta_calculada": round(renta_calculada_36M,2),
-                "Descuento_mensual": round(descuento_mensual,2),
-                "Renta_descuento": round(renta_descuento_36M,2),
-                "IVA_renta": round(iva_renta_descuento_36M,2),
-                "Fondo_reserva": round(fondo_reserva_36M,2),
-                "Renta_mensual_total": round(total_renta_36M,2),
-                "Valor_residual": round(residual_siva_36M,2),
-            }
+            tabla_36M = calculo_escenario (36, cat_otros_gastos, cat_valor_residual, variables_escenario)
+
             
             tabla_cotizacion = {
                 "Residual_siva": round(residual_siva,2),
