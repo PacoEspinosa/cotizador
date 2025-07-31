@@ -230,6 +230,8 @@ def cotizador_optimo():
         otros_gastos_siva = cat_otros_gastos[bucket_meses]
         iva_otros_gastos = otros_gastos_siva*iva
         otros_gastos = otros_gastos_siva + iva_otros_gastos
+        if (pago_inicial_total-seguro) > (valor_siva*precio_activo) and deposito_garantia == 0:
+            deposito_garantia = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
         valor_inicial_arrenda = pago_inicial_total - seguro - deposito_garantia
         comision_apertura = (valor_factura + accesorios + otros_gastos - valor_inicial_arrenda)*(tasa_comision_apertura/100)
         comision_apertura_siva = comision_apertura/(1+iva)
@@ -555,6 +557,15 @@ def cotizador_optimo():
                     "pago_capital": ingresos_capital + pago_residual
                     }
             
+            #calculo de la TIR 
+            flujos = [-tabla_interna['Año1']["capital_vigente"]]
+            for n in tabla_interna:
+                movs = (tabla_interna[n]['ingresos_capital'] + tabla_interna[n]['ingresos_intereses'] + tabla_interna[n]['pago_residual'])
+                flujos.append(movs)
+            
+            tir = nf.irr(flujos)
+            
+            
         #**************   Tabla de cotizacion   **********************
         if (tipo_respuesta == 5 or tipo_respuesta == 6 ):
            
@@ -620,6 +631,7 @@ def cotizador_optimo():
             }
         elif tipo_respuesta == 4:
             response = {
+                "tir": round(tir*100,2),
                 "tabla_interna": tabla_interna
             }
         elif tipo_respuesta == 5:
@@ -638,6 +650,7 @@ def cotizador_optimo():
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),
                 "renta_mensual_facturada": round(renta_mensual_facturada, 2),
                 "pago_credito_calculada": round(pago_credito, 2),
+                "tir": round(tir*100,2),
                 "tabla_amortizacion": tabla_amortizacion,
                 "tabla_resumen": tabla_resumen,
                 "tabla_cotizacion": tabla_cotizacion,

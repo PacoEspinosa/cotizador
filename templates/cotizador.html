@@ -175,7 +175,7 @@
 						<tbody>
 							{% for key, value in api_response.tabla_cotizacion.items() %}
 							<tr>
-								<td><strong>{{ key.replace('_', ' ').title() }}</strong></td>
+								<td><strong>{{ visualizacion_cotizacion[key] }}</strong></td>
 								<td>{{ "${:,.2f}".format(value) }}</td>
 							</tr>
 							{% endfor %}
@@ -221,6 +221,7 @@
 			<div id="interna" class="tabcontent">
 				<h2>Tabla Interna</h2>
 				{% if api_response.tabla_resumen %}
+					<p><strong>Tasa Interna de Retorno:</strong> {{ "{:,.2f}".format(api_response.tir) }}</p>
 					<table>
 						<thead>
 							<tr>
