@@ -93,6 +93,9 @@
     {% if api_response %}
 		<body>
 			<h1>Resultados del cotizador</h1>
+			<div class="container">
+				<button onclick="openPopup()">Salvar Cotización</button>
+			</div>
 
 			<div class="tabs">
 				<button class="tablinks active" onclick="openTab(event, 'resumen')">Tabla de Resumen</button>
@@ -280,6 +283,29 @@
 				document.addEventListener('DOMContentLoaded', (event) => {
 					document.querySelector('.tablinks.active').click();
 				});
+			</script>
+			<script>
+				function openPopup() {
+					// Configura las propiedades de la ventana pop-up
+					const width = 800;
+					const height = 800;
+					const left = (screen.width / 2) - (width / 2);
+					const top = (screen.height / 2) - (height / 2);
+
+					// Abre la ventana pop-up
+					// 'open_popup' es una ruta de Flask que podría servir contenido
+					// o simplemente una página estática para el popup.
+					// Para este ejemplo, el contenido del popup es simple texto.
+					const popupWindow = window.open('/open_popup', 'PopupVentana',
+						`width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+
+					// Opcional: enfocar la ventana si ya está abierta
+					if (popupWindow) {
+						popupWindow.focus();
+					} else {
+						alert("El pop-up fue bloqueado por el navegador. Por favor, deshabilita el bloqueador de pop-ups para este sitio.");
+					}
+				}
 			</script>
 		</body>
     {% elif error_message %}
