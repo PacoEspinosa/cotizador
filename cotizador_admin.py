@@ -61,8 +61,6 @@ def configuracion():
                         form_data[key] = int(value)
 
             # Actualizar la estructura del JSON con los nuevos datos
-            # Esto es un ejemplo simple, para una estructura anidada se necesitaría un parser más robusto
-            # Para este ejemplo, haremos un merge simple para los campos de primer nivel
             for main_key in config_data:
                 if isinstance(config_data[main_key], dict):
                     for sub_key in config_data[main_key]:
@@ -98,6 +96,20 @@ def configuracion():
                     if key in form_data:
                         config_data["catalogo_conceptos_factura"][concepto][param] = form_data[key]
 
+            # Manejo específico para catalogo_valor_residual
+            for concepto in config_data["catalogo_valor_residual"]:
+                for param in ['min', 'max']:
+                    key = f"catalogo_valor_residual_{concepto}_{param}"
+                    if key in form_data:
+                        config_data["catalogo_valor_residual"][concepto][param] = form_data[key]
+
+            # Manejo específico para catalogo_valor_residual
+            for concepto in config_data["catalogo_tasa_anual"]:
+                for param in ['Auto', 'Tracto/maquina','Bicicleta']:
+                    key = f"catalogo_tasa_anual_{concepto}_{param}"
+                    if key in form_data:
+                        config_data["catalogo_tasa_anual"][concepto][param] = form_data[key]
+                        
             save_config(config_data)
             flash('Configuración actualizada exitosamente!', 'success')
             return redirect(url_for('configuracion'))

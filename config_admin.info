@@ -104,8 +104,8 @@
       "max": 25
     },
     "Bicicleta": {
-      "min": 5,
-      "max": 5
+      "min": 6,
+      "max": 6
     }
   },
   "catalogo_tasa_anual": {
