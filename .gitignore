@@ -7,4 +7,6 @@ test_varias_pruebas.py
 selectividad_validacion_API_Key.py
 test_selectividad _validacion_API_Key.py
 test_setup.py
+config_admin.info
+config_app.info
 /pruebas
