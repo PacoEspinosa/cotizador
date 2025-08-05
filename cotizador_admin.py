@@ -186,6 +186,22 @@ def cotizador():
     error_message = None
     es_inversion = False
     payload = {}
+    visualizacion_cotizacion = {
+        "Accesorios": 'Costo Accesorios',
+        "Comision_apertura_siva": 'Comision por apertura',
+        "Deposito_garantia": 'Deposito en garantia',
+        "Descuento_mensual": 'Descuento mensual',
+        "Fondo_reserva": 'Fondo de reserva',
+        "Iva_renta_mensual_descuento": 'IVA de renta',
+        "Monto_arrendamiento_siva": 'Monto del arrendamiento',
+        "Pago_inicial_total": 'Total pago inicial',
+        "Renta_mensual_calculada": 'Renta mensual sin IVA',
+        "Renta_mensual_descuento": 'Total de renta con descuento',
+        "Residual_siva": 'Valor residual sin IVA',
+        "Seguro": 'Seguro anual',
+        "Total_renta_mensual_descuento": 'Total renta mensual con IVA',
+        "Valor_inicial_arrenda": 'Anticipo del arrendamiento'
+        }
 
     if request.method == 'POST':
         try:
@@ -243,22 +259,6 @@ def cotizador():
                 flash(error_message, 'error')
             else:
                 api_response = response.json()
-                visualizacion_cotizacion = {
-                    "Accesorios": 'Costo Accesorios',
-                    "Comision_apertura_siva": 'Comision por apertura',
-                    "Deposito_garantia": 'Deposito en garantia',
-                    "Descuento_mensual": 'Descuento mensual',
-                    "Fondo_reserva": 'Fondo de reserva',
-                    "Iva_renta_mensual_descuento": 'IVA de renta',
-                    "Monto_arrendamiento_siva": 'Monto del arrendamiento',
-                    "Pago_inicial_total": 'Total pago inicial',
-                    "Renta_mensual_calculada": 'Renta mensual sin IVA',
-                    "Renta_mensual_descuento": 'Total de renta con descuento',
-                    "Residual_siva": 'Valor residual sin IVA',
-                    "Seguro": 'Seguro anual',
-                    "Total_renta_mensual_descuento": 'Total renta mensual con IVA',
-                    "Valor_inicial_arrenda": 'Anticipo del arrendamiento'
-                    }
                 if 'admin_message' in api_response:
                     flash(api_response['admin_message'], 'success')
 
@@ -277,7 +277,7 @@ def cotizador():
 
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
                            tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], 
-                           input_lines = (payload if len(payload) > 0 else []), visualizacion_cotizacion =(visualizacion_cotizacion if len(payload) > 0 else []) )
+                           input_lines = (payload if len(payload) > 0 else []), visualizacion_cotizacion =(visualizacion_cotizacion if len(payload) > 0 else []))
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)
