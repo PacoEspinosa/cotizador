@@ -16,7 +16,7 @@
             background-color: #f4f4f4;
         }
         .containerh {
-            width: 970px;
+            width: 95%;
 			display: flex;
             margin: 0 auto;
 			justify-content: space-between;
@@ -29,19 +29,19 @@
         .container {
             border: 1px solid #000;
             padding: 15px;
-            width: 970px; 
+            width: 95%;
             box-sizing: border-box;
             background-color: #fff;
 			margin-bottom: 10px;
         }
         .container2 {
             display: flex;
-            gap: 20px; /* Space between the three columns */
+            gap: 2%; 
         }
 		.option-box {
             border: 1px solid #000;
             padding: 15px;
-            width: 310px; /* Adjust width as needed for each box */
+            width: 32%; 
             box-sizing: border-box;
             background-color: #fff;
             display: flex;
@@ -82,12 +82,12 @@
         .containerf {
             display: flex;
             justify-content: space-between;
-            width: 970px; /* Adjust width as per the image's layout */
+            width: 95%; 
             padding: 10px;
         }
         .conditions-list {
-            flex: 2; /* Takes more space */
-            list-style: none; /* Remove default bullet points */
+            flex: 2; 
+            list-style: none; 
             padding: 0;
             margin: 0;
             font-size: 0.6em;
@@ -97,11 +97,11 @@
             margin-bottom: 5px;
         }
         .signature-section {
-            flex: 1; /* Takes less space */
+            flex: 1; 
             text-align: center;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Align content to the bottom */
+            justify-content: flex-end; 
             padding-top: 20px; 
         }
         .signature-section p {
@@ -114,18 +114,18 @@
         }
         .signature-section .name {
             font-size: 1.1em;
-            margin-bottom: 5px; /* Space between name and line */
+            margin-bottom: 5px; 
         }
         .signature-line {
             border-bottom: 1px solid #000;
-            width: 150px; /* Adjust line width as needed */
+            width: 150px; 
         }
         .logo-section {
-            flex-shrink: 0; /* Prevent logo from shrinking */
-            margin-right: 20px; /* Space between logo and text */
+            flex-shrink: 0; 
+            margin-right: 20px; 
         }
         .logo-section img {
-            height: 100px; /* Adjust logo height as needed */
+            height: 100px; 
             width: auto;
         }
         .date-section {
@@ -145,17 +145,17 @@
         }
         .containerff {
             display: flex;
-            width: 100%;
-            max-width: 1200px;
+            width: 90%;
             align-items: flex-start;
             justify-content: space-between;
-        }         .left-content {
+        }         
+		.left-content {
             display: flex;
             align-items: flex-start;
             position: relative;
         }
         .dog-image {
-            width: 200px;
+            width: 80%;
             height: auto;
             position: relative;
             z-index: 1;
@@ -175,23 +175,9 @@
             align-items: center;
         }
         .social-qrs img {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border: 1px solid #ccc; 
-        }
-        /* Estilos específicos para impresión (opcional) */
-        @media print {
-            .btn-container {
-                display: none; /* Oculta el botón de imprimir en el PDF */
-            }
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            .header, .content {
-                box-shadow: none;
-                background-color: white;
-            }
         }
 		</style>
 
@@ -217,32 +203,32 @@
 				<p><strong>Cotización para:</strong> Persona moral</p>
 			</div>
 		</div>
-	<div class="container">
-		<div class="row">
-			<div class="item">
+	<section class="container">
+		<section class="row">
+			<section class="item">
 				<span class="label">Valor Factura:</span> $ 1,650,000
-			</div>
-			<div class="item">
+			</section>
+			<section class="item">
 				<span class="label">Submarca y versión:</span> GLC 350 e 4MATIC Coupe
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
 				<span class="label">Marca:</span> Mercedes-Benz
-			</div>
-			<div class="item">
+			</section>
+			<section class="item">
 				<span class="label">Tipo:</span> Nuevo
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
 				<span class="label">Modelo:</span> 2025
-			</div>
-			<div class="item">
+			</section>
+			<section class="item">
 				<span class="label">Período cotizado:</span> <span class="label">48 meses</span>
-			</div>
-		</div>
-	</div>
+			</section>
+		</section>
+	</section>
 	<div class="container">
 		<div class="row">
 			<div class="item">
@@ -430,14 +416,6 @@
             </div>
         </div>
     </div>
-    <div class="btn-container">
-        <button onclick="savePageAsPdf()">Guardar como PDF</button>
-    </div>
-
-    <script>
-        function savePageAsPdf() {
-            window.print();
-        }
-    </script>	
+	
 </body>
 </html>

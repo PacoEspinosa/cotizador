@@ -18,6 +18,8 @@ text = open(CONFIG_FILE)
 config = json.loads(text.read())
 text.close()
 API_URL = config["cotizacion_admin_config"]["url_produccion"]
+api_response = None
+input_lines = None
 
 def load_config():
     """Carga la configuración desde el archivo JSON."""
@@ -186,7 +188,8 @@ def cotizador():
     error_message = None
     es_inversion = False
     payload = {}
-
+    visualizacion_cotizacion = {}
+    
     if request.method == 'POST':
         try:
             # Obtener datos del formulario
@@ -278,6 +281,11 @@ def cotizador():
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
                            tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], 
                            input_lines = (payload if len(payload) > 0 else []), visualizacion_cotizacion =(visualizacion_cotizacion if len(payload) > 0 else []) )
+
+@app.route('/open_popup')
+def open_popup():
+    flash(api_response,"success")
+    return render_template('plantilla_cotizacion.html',api_response = api_response, input_lines = input_lines)
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)
