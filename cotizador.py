@@ -19,18 +19,22 @@ API_KEYS = {
 CONFIG_FILE = 'config_app.info'
 
 # --- Funciones  ---
-def calculo_escenario (escenario_meses, cat_otros_gastos, cat_valor_residual, variables_escenario):
+def calculo_escenario (escenario_meses, cat_otros_gastos, cat_valor_residual, variables_escenario, esquema_fijo):
     otros_gastos_ciclo = cat_otros_gastos[str(escenario_meses)] * (1 + variables_escenario['iva'])
     comision_apertura_ciclo = (variables_escenario['valor_factura'] + variables_escenario['accesorios'] + otros_gastos_ciclo - variables_escenario['valor_inicial_arrenda'])*(variables_escenario['tasa_comision_apertura']/100)
     monto_arrendamiento_ciclo = (variables_escenario['valor_factura'] + variables_escenario['accesorios'] + otros_gastos_ciclo + comision_apertura_ciclo - variables_escenario['valor_inicial_arrenda'])
     monto_arrendamiento_siva_ciclo = monto_arrendamiento_ciclo/(1 + variables_escenario['iva'])
-    residual_siva_ciclo = (cat_valor_residual[str(escenario_meses)]["max"]/100)*variables_escenario['valor_siva']
+    if esquema_fijo:
+        residual_siva_ciclo = variables_escenario['residual_siva']
+    else:
+        residual_siva_ciclo = (cat_valor_residual[str(escenario_meses)]["max"]/100)*variables_escenario['valor_siva']
     renta_calculada_ciclo = nf.pmt(variables_escenario['tasa_interes_mensual'],escenario_meses,-monto_arrendamiento_siva_ciclo,residual_siva_ciclo)
     renta_descuento_ciclo = renta_calculada_ciclo - variables_escenario['descuento_mensual']
     iva_renta_descuento_ciclo = renta_descuento_ciclo * variables_escenario['iva']
     fondo_reserva_ciclo = renta_descuento_ciclo * (variables_escenario['tasa_fondo_reserva']/100)
     total_renta_ciclo =(renta_descuento_ciclo + iva_renta_descuento_ciclo + fondo_reserva_ciclo)
     tabla_escenario = {
+        "Escenario_meses": escenario_meses,
         "Renta_calculada": round(renta_calculada_ciclo,2),
         "Descuento_mensual": round(variables_escenario['descuento_mensual'],2),
         "Renta_descuento": round(renta_descuento_ciclo,2),
@@ -40,6 +44,7 @@ def calculo_escenario (escenario_meses, cat_otros_gastos, cat_valor_residual, va
         "Valor_residual": round(residual_siva_ciclo,2),
     }
     return tabla_escenario
+    
 # Middleware o decorador para verificación de API Key
 def require_api_key(func):
     def wrapper(*args, **kwargs):
@@ -230,8 +235,12 @@ def cotizador_optimo():
         otros_gastos_siva = cat_otros_gastos[bucket_meses]
         iva_otros_gastos = otros_gastos_siva*iva
         otros_gastos = otros_gastos_siva + iva_otros_gastos
-        if (pago_inicial_total-seguro) > (valor_siva*precio_activo) and deposito_garantia == 0:
-            deposito_garantia = (pago_inicial_total-seguro) - (valor_siva*precio_activo)
+        #if (pago_inicial_total-seguro) > (valor_siva*precio_activo) and deposito_garantia == 0:
+        if (pago_inicial_total-seguro) > (valor_siva*precio_activo):
+            if es_inversion:
+                return jsonify({"error": "El pago inicial genera un valor mayor al permitido y ya se tiene un deposito en inversion."}), 400
+            else:
+                deposito_garantia += (pago_inicial_total-seguro) - (valor_siva*precio_activo)
         valor_inicial_arrenda = pago_inicial_total - seguro - deposito_garantia
         comision_apertura = (valor_factura + accesorios + otros_gastos - valor_inicial_arrenda)*(tasa_comision_apertura/100)
         comision_apertura_siva = comision_apertura/(1+iva)
@@ -578,16 +587,26 @@ def cotizador_optimo():
                 "valor_siva": valor_siva,
                 "tasa_interes_mensual": tasa_interes_mensual,
                 "tasa_fondo_reserva": tasa_fondo_reserva,
-                "descuento_mensual": descuento_mensual
+                "descuento_mensual": descuento_mensual,
+                "residual_siva": residual_siva
                 }
+            if plazo_meses == 24:
+                set_plazos = [12, 36, 48]
+            elif plazo_meses == 36:
+                set_plazos = [12, 24, 48]
+            elif plazo_meses == 48:
+                set_plazos = [12, 24, 36]
+            else:
+                set_plazos = [24, 36, 48]
+                
             #Escenario 12 meses
-            tabla_12M = calculo_escenario (12, cat_otros_gastos, cat_valor_residual, variables_escenario)
+            tabla_1 = calculo_escenario (set_plazos[0], cat_otros_gastos, cat_valor_residual, variables_escenario, True)
 
             #Escenario 24 meses
-            tabla_24M = calculo_escenario (24, cat_otros_gastos, cat_valor_residual, variables_escenario)
+            tabla_2 = calculo_escenario (set_plazos[1], cat_otros_gastos, cat_valor_residual, variables_escenario, True)
 
             #Escenario 36 meses
-            tabla_36M = calculo_escenario (36, cat_otros_gastos, cat_valor_residual, variables_escenario)
+            tabla_3 = calculo_escenario (set_plazos[2], cat_otros_gastos, cat_valor_residual, variables_escenario, True)
 
             
             tabla_cotizacion = {
@@ -637,9 +656,9 @@ def cotizador_optimo():
         elif tipo_respuesta == 5:
             response = {
                 "tabla_cotizacion": tabla_cotizacion,
-                "Tabla_12M": tabla_12M,
-                "Tabla_24M": tabla_24M,
-                "Tabla_36M": tabla_36M                
+                "Tabla_1": tabla_1,
+                "Tabla_2": tabla_2,
+                "Tabla_3": tabla_3
             }
         elif tipo_respuesta == 6:
             response = {
@@ -654,9 +673,9 @@ def cotizador_optimo():
                 "tabla_amortizacion": tabla_amortizacion,
                 "tabla_resumen": tabla_resumen,
                 "tabla_cotizacion": tabla_cotizacion,
-                "tabla_12M": tabla_12M,
-                "tabla_24M": tabla_24M,
-                "tabla_36M": tabla_36M,
+                "Tabla_1": tabla_1,
+                "Tabla_2": tabla_2,
+                "Tabla_3": tabla_3,
                 "tabla_facturacion": tabla_facturacion,
                 "tabla_interna": tabla_interna
             }

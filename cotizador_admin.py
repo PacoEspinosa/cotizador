@@ -18,8 +18,6 @@ text = open(CONFIG_FILE)
 config = json.loads(text.read())
 text.close()
 API_URL = config["cotizacion_admin_config"]["url_produccion"]
-api_response = None
-input_lines = None
 
 def load_config():
     """Carga la configuración desde el archivo JSON."""
@@ -63,8 +61,6 @@ def configuracion():
                         form_data[key] = int(value)
 
             # Actualizar la estructura del JSON con los nuevos datos
-            # Esto es un ejemplo simple, para una estructura anidada se necesitaría un parser más robusto
-            # Para este ejemplo, haremos un merge simple para los campos de primer nivel
             for main_key in config_data:
                 if isinstance(config_data[main_key], dict):
                     for sub_key in config_data[main_key]:
@@ -100,6 +96,20 @@ def configuracion():
                     if key in form_data:
                         config_data["catalogo_conceptos_factura"][concepto][param] = form_data[key]
 
+            # Manejo específico para catalogo_valor_residual
+            for concepto in config_data["catalogo_valor_residual"]:
+                for param in ['min', 'max']:
+                    key = f"catalogo_valor_residual_{concepto}_{param}"
+                    if key in form_data:
+                        config_data["catalogo_valor_residual"][concepto][param] = form_data[key]
+
+            # Manejo específico para catalogo_valor_residual
+            for concepto in config_data["catalogo_tasa_anual"]:
+                for param in ['Auto', 'Tracto/maquina','Bicicleta']:
+                    key = f"catalogo_tasa_anual_{concepto}_{param}"
+                    if key in form_data:
+                        config_data["catalogo_tasa_anual"][concepto][param] = form_data[key]
+                        
             save_config(config_data)
             flash('Configuración actualizada exitosamente!', 'success')
             return redirect(url_for('configuracion'))
@@ -188,8 +198,23 @@ def cotizador():
     error_message = None
     es_inversion = False
     payload = {}
-    visualizacion_cotizacion = {}
-    
+    visualizacion_cotizacion = {
+        "Accesorios": 'Costo Accesorios',
+        "Comision_apertura_siva": 'Comision por apertura',
+        "Deposito_garantia": 'Deposito en garantia',
+        "Descuento_mensual": 'Descuento mensual',
+        "Fondo_reserva": 'Fondo de reserva',
+        "Iva_renta_mensual_descuento": 'IVA de renta',
+        "Monto_arrendamiento_siva": 'Monto del arrendamiento',
+        "Pago_inicial_total": 'Total pago inicial',
+        "Renta_mensual_calculada": 'Renta mensual sin IVA',
+        "Renta_mensual_descuento": 'Total de renta con descuento',
+        "Residual_siva": 'Valor residual sin IVA',
+        "Seguro": 'Seguro anual',
+        "Total_renta_mensual_descuento": 'Total renta mensual con IVA',
+        "Valor_inicial_arrenda": 'Anticipo del arrendamiento'
+        }
+
     if request.method == 'POST':
         try:
             # Obtener datos del formulario
@@ -246,22 +271,6 @@ def cotizador():
                 flash(error_message, 'error')
             else:
                 api_response = response.json()
-                visualizacion_cotizacion = {
-                    "Accesorios": 'Costo Accesorios',
-                    "Comision_apertura_siva": 'Comision por apertura',
-                    "Deposito_garantia": 'Deposito en garantia',
-                    "Descuento_mensual": 'Descuento mensual',
-                    "Fondo_reserva": 'Fondo de reserva',
-                    "Iva_renta_mensual_descuento": 'IVA de renta',
-                    "Monto_arrendamiento_siva": 'Monto del arrendamiento',
-                    "Pago_inicial_total": 'Total pago inicial',
-                    "Renta_mensual_calculada": 'Renta mensual sin IVA',
-                    "Renta_mensual_descuento": 'Total de renta con descuento',
-                    "Residual_siva": 'Valor residual sin IVA',
-                    "Seguro": 'Seguro anual',
-                    "Total_renta_mensual_descuento": 'Total renta mensual con IVA',
-                    "Valor_inicial_arrenda": 'Anticipo del arrendamiento'
-                    }
                 if 'admin_message' in api_response:
                     flash(api_response['admin_message'], 'success')
 
@@ -280,12 +289,7 @@ def cotizador():
 
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
                            tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], 
-                           input_lines = (payload if len(payload) > 0 else []), visualizacion_cotizacion =(visualizacion_cotizacion if len(payload) > 0 else []) )
-
-@app.route('/open_popup')
-def open_popup():
-    flash(api_response,"success")
-    return render_template('plantilla_cotizacion.html',api_response = api_response, input_lines = input_lines)
+                           input_lines = (payload if len(payload) > 0 else []), visualizacion_cotizacion =(visualizacion_cotizacion if len(payload) > 0 else []))
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)
