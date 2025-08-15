@@ -8,7 +8,7 @@ Created on Thu Jun 26 19:13:44 2025
 import json
 import requests
 import numpy_financial as nf
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key' # Cambia esto por una clave secreta fuerte
@@ -18,6 +18,7 @@ text = open(CONFIG_FILE)
 config = json.loads(text.read())
 text.close()
 API_URL = config["cotizacion_admin_config"]["url_produccion"]
+payload = None
 
 def load_config():
     """Carga la configuración desde el archivo JSON."""
@@ -197,7 +198,8 @@ def cotizador():
     api_response = None
     error_message = None
     es_inversion = False
-    payload = {}
+    payload = None
+    otros_datos = None
     visualizacion_cotizacion = {
         "Accesorios": 'Costo Accesorios',
         "Comision_apertura_siva": 'Comision por apertura',
@@ -262,6 +264,31 @@ def cotizador():
                 "tipo_respuesta": tipo_respuesta,
                 "fuente_consulta": fuente_consulta
             }
+            
+            session["payload"] = payload
+            
+            cliente = request.form.get('cliente', '')
+            atencion = request.form.get('atencion', '')
+            tipo_activo = request.form.get('tipo_activo', '')
+            tipo_persona = request.form.get('tipo_persona','')
+            unidades = request.form.get('unidades', '')
+            marca = request.form.get('marca', '')
+            modelo = request.form.get('modelo', '')
+            submarca = request.form.get('submarca', '')
+            
+            otros_datos = {
+                "cliente": cliente,
+                "atencion": atencion,
+                "tipo_activo": tipo_activo,
+                "tipo_persona": tipo_persona,
+                "unidades": unidades,
+                "marca": marca,
+                "modelo": modelo,
+                "submarca": submarca
+                }
+            
+            session["otros_datos"] = otros_datos
+            
             #flash(payload,"success")
             headers = {'Content-Type': 'application/json'}
             response = requests.post(API_URL, json=payload, headers=headers)
@@ -271,9 +298,10 @@ def cotizador():
                 flash(error_message, 'error')
             else:
                 api_response = response.json()
+                session["api_response"] = api_response
                 if 'admin_message' in api_response:
                     flash(api_response['admin_message'], 'success')
-
+                
         except json.JSONDecodeError:
             # Si no es JSON, imprimimos el texto plano de la respuesta
             if not response.ok:
@@ -287,9 +315,21 @@ def cotizador():
             error_message = f"Ocurrió un error inesperado: {e}"
             flash(error_message, 'error')
 
+                
     return render_template('cotizador.html', api_response = api_response, error_message=error_message, tbl_tipo_activo=config["catalogo_tipo_activo"],
                            tbl_tipo_vehiculo = config["catalogo_tipo_vehiculo"],tbl_planes = config["catalogo_tasa_anual"], 
-                           input_lines = (payload if len(payload) > 0 else []), visualizacion_cotizacion =(visualizacion_cotizacion if len(payload) > 0 else []))
+                           input_lines = (payload if payload is not None else []), visualizacion_cotizacion =(visualizacion_cotizacion if payload is not None else []),
+                           otros_datos =(otros_datos if otros_datos is not None else []))
+
+@app.route('/open_popup')
+def open_popup():
+    """
+    Esta ruta podría ser usada para contenido que se cargará en el popup,
+    pero en este ejemplo, la apertura del popup es manejada por JavaScript
+    en el lado del cliente. Podrías usar esta ruta para enviar datos dinámicos.
+    """
+    
+    return render_template('plantilla_cotizacion.html', input_lines=session["payload"], response = session["api_response"], otros_datos = session["otros_datos"])
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)

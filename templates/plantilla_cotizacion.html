@@ -82,12 +82,12 @@
         .containerf {
             display: flex;
             justify-content: space-between;
-            width: 970px; /* Adjust width as per the image's layout */
+            width: 970px; 
             padding: 10px;
         }
         .conditions-list {
-            flex: 2; /* Takes more space */
-            list-style: none; /* Remove default bullet points */
+            flex: 2; 
+            list-style: none; 
             padding: 0;
             margin: 0;
             font-size: 0.6em;
@@ -97,11 +97,11 @@
             margin-bottom: 5px;
         }
         .signature-section {
-            flex: 1; /* Takes less space */
+            flex: 1; 
             text-align: center;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Align content to the bottom */
+            justify-content: flex-end; 
             padding-top: 20px; 
         }
         .signature-section p {
@@ -179,6 +179,22 @@
             height: 100px;
             border: 1px solid #ccc; 
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+			font-size: 10px;
+        }
+        th, td {
+            padding: 5px 5px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
         /* Estilos específicos para impresión (opcional) */
         @media print {
             .btn-container {
@@ -207,97 +223,98 @@
 			</div>
 			<div class="date-section">
 				<p>Fecha</p>
-				<p class="date-value">15 de Mayo 2025</p>
+				<p id="fechaActual"></p>
 			</div>
+
 		</div>
 		<div class="containerh">
 			<div class="info-section">
-				<p><strong>Cliente:</strong> Evelyn Pérez</p>
-				<p><strong>Atención a:</strong> Evelyn Pérez</p>
-				<p><strong>Cotización para:</strong> Persona moral</p>
+				<p><strong>Cliente:</strong> {{ (otros_datos["cliente"] if otros_datos["cliente"]!='' else "A quien Corresponda.") }}</p>
+				<p><strong>Atención a:</strong>{{ (otros_datos["atencion"] if otros_datos["atencion"]!='' else "A quien Corresponda.") }}</p>
+				<p><strong>Cotización para:</strong>{{ (otros_datos["tipo_persona"] if otros_datos["tipo_persona"]!='' else "Persona Moral.") }}</p>
 			</div>
 		</div>
-	<div class="container">
-		<div class="row">
-			<div class="item">
-				<span class="label">Valor Factura:</span> $ 1,650,000
-			</div>
-			<div class="item">
-				<span class="label">Submarca y versión:</span> GLC 350 e 4MATIC Coupe
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Marca:</span> Mercedes-Benz
-			</div>
-			<div class="item">
-				<span class="label">Tipo:</span> Nuevo
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Modelo:</span> 2025
-			</div>
-			<div class="item">
-				<span class="label">Período cotizado:</span> <span class="label">48 meses</span>
-			</div>
-		</div>
-	</div>
+	<section class="container">
+		<section class="row">
+			<section class="item">
+				<span class="label">Valor Factura:</span> {{ "${:,.2f}".format(input_lines["valor_factura"]) }}
+			</section>
+			<section class="item">
+				<span class="label">Submarca y versión:</span>{{ (otros_datos["submarca"] if otros_datos["submarca"]!='' else "Sin especificar.") }}
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Marca:</span> {{ (otros_datos["marca"] if otros_datos["marca"]!='' else "Sin especificar.") }}
+			</section>
+			<section class="item">
+				<span class="label">Tipo:</span>  {{ (otros_datos["tipo_activo"] if otros_datos["tipo_activo"]!='' else "Nuevo.") }}
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Modelo:</span> {{ (otros_datos["modelo"] if otros_datos["modelo"]!='' else "Sin especificar.") }}
+			</section>
+			<section class="item">
+				<span class="label">Período cotizado:</span> <span class="label">{{ "{:,.0f}".format(input_lines["plazo_meses"]) }} meses</span>
+			</section>
+		</section>
+	</section>
 	<div class="container">
 		<div class="row">
 			<div class="item">
 				<span class="label"></span> <span class="value"></span>
 			</div>
 			<div class="item">
-				<span class="label">Valor residual sin IVA:</span> <span class="value">$ 568,965.52</span>
+				<span class="label">Valor residual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["residual_siva"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Valor inicial del arrendamiento:</span> <span class="value">$ 156,817.18</span>
+				<span class="label">Anticipo del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Valor_inicial_arrenda"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">Total pago inicial:</span> <span class="value">$ 203,616.18</span>
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Rentas en depósito con IVA:</span> <span class="value">$ 0</span>
-			</div>
-			<div class="item">
-				<span class="label">Renta mensual sin IVA:</span> <span class="value">$ 30,685</span>
+				<span class="label">Total pago inicial:</span> <span class="value">{{ "${:,.2f}".format(input_lines["pago_inicial_total"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Comisión por apertura:</span> <span class="value">$ 13,099.27</span>
+				<span class="label">Deposito en garantia:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Deposito_garantia"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Seguro anual con IVA:</span> <span class="value">$ 46,799</span>
-			</div>
-			<div class="item">
-				<span class="label">Total de renta con descuento:</span> <span class="value">$ 30,685</span>
+				<span class="label">Renta mensual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_calculada"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Costo de accesorios:</span> <span class="value">$ 0</span>
+				<span class="label">Comisión por apertura:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Comision_apertura_siva"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">IVA de renta:</span> <span class="value">$ 4,909.6</span>
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Descuento_mensual"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Monto del arrendamiento:</span> <span class="value">$ 1,323,025.83</span>
+				<span class="label">Seguro anual con IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["seguro"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
+				<span class="label">Total de renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Costo de accesorios:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Accesorios"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">IVA de renta:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Iva_renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Monto del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Monto_arrendamiento_siva"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Fondo_reserva"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
@@ -305,7 +322,7 @@
 				<span class="label"></span> <span class="value"></span>
 			</div>
 			<div class="item">
-				<span class="label">Total renta mensual con IVA:</span> <span class="value">$ 35,594.6</span>
+				<span class="label">Total renta mensual con IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Total_renta_mensual_descuento"]) }}</span>
 			</div>
 		</div>
 	</div>
@@ -313,85 +330,87 @@
     <div class="container2">
         <div class="option-box">
             <div class="option-title">
-                Opcion de renta #1<br>Plazo a 12 meses
+                Opcion de renta #1<br>Plazo a {{ "{:,.0f}".format(response["Tabla_1"]["Escenario_meses"]) }} meses
             </div>
             <div class="row">
-                <span class="label">Renta:</span> <span class="value">$ 77,966.03</span>
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_calculada"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
+                <span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Descuento_mensual"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta con descuento:</span> <span class="value">$ 77,966.03</span>
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_descuento"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Iva de la renta:</span> <span class="value">$ 12,474.57</span>
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["IVA_renta"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Fondo_reserva"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta mensual total:</span> <span class="value">$ 90,440.6</span>
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_mensual_total"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Valor residual sugerido:</span> <span class="value">$ 711,206.9</span>
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Valor_residual"]) }}</span>
             </div>
         </div>
 
         <div class="option-box">
             <div class="option-title">
-                Opcion de renta #2<br>Plazo a 24 meses
+                Opcion de renta #2<br>Plazo a {{ "{:,.0f}".format(response["Tabla_2"]["Escenario_meses"]) }} meses
             </div>
             <div class="row">
-                <span class="label">Renta:</span> <span class="value">$ 57,654.06</span>
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_calculada"]) }}</span>
+            </div>
+			<div class="row">
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Descuento_mensual"]) }}</span>
+			</div>
+            <div class="row">
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_descuento"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["IVA_renta"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta con descuento:</span> <span class="value">$ 57,654.06</span>
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Fondo_reserva"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Iva de la renta:</span> <span class="value">$ 9,224.65</span>
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_mensual_total"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
-            </div>
-            <div class="row">
-                <span class="label">Renta mensual total:</span> <span class="value">$ 66,878.71</span>
-            </div>
-            <div class="row">
-                <span class="label">Valor residual sugerido:</span> <span class="value">$ 568,965.52</span>
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Valor_residual"]) }}</span>
             </div>
         </div>
 
+
         <div class="option-box">
             <div class="option-title">
-                Opcion de renta #3<br>Plazo a 36 meses
+                Opcion de renta #3<br>Plazo a {{ "{:,.0f}".format(response["Tabla_3"]["Escenario_meses"]) }} meses
             </div>
             <div class="row">
-                <span class="label">Renta:</span> <span class="value">$ 49,061.79</span>
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_calculada"]) }}</span>
+            </div>
+			<div class="row">
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Descuento_mensual"]) }}</span>
+			</div>
+            <div class="row">
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_descuento"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["IVA_renta"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta con descuento:</span> <span class="value">$ 49,061.79</span>
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Fondo_reserva"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Iva de la renta:</span> <span class="value">$ 7,849.89</span>
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_mensual_total"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
-            </div>
-            <div class="row">
-                <span class="label">Renta mensual total:</span> <span class="value">$ 56,911.68</span>
-            </div>
-            <div class="row">
-                <span class="label">Valor residual sugerido:</span> <span class="value">$ 497,844.83</span>
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Valor_residual"]) }}</span>
             </div>
         </div>
     </div>
+
 
     <div class="containerf">
         <ul class="conditions-list">
@@ -402,6 +421,7 @@
             <li>* Valores expresados en pesos mexicanos</li>
             <li>* KILOMETRAJE ILIMITADO DURANTE EL PLAZO DEL ARRENDAMIENTO</li>
             <li>* No incluye seguro</li>
+            <li>* El valor factura del vehiculo esta sujeto a la actualizacion de cada marca</li>
         </ul>
 
         <div class="signature-section">
@@ -433,8 +453,128 @@
     <div class="btn-container">
         <button onclick="savePageAsPdf()">Guardar como PDF</button>
     </div>
+<div style="page-break-after: always;"></div>
+		<div class="containerh">
+		    <div class="logo-section">
+				<img src="olr-leasing-logo.png" alt="OLR Leasing Logo">
+			</div>
+			<div class="header">
+				<h1>OLR LEASING SAPI DE CV</h1>
+				<h2>Arrendamiento Puro</h2>
+			</div>
+			<div class="date-section">
+				<p>Fecha</p>
+				<p id="fechaActual"></p>
+			</div>
+		</div>
+		<div>
+			<h2>Tabla de Resumen</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>Concepto</th>
+						<th>Compra</th>
+						<th>Crédito</th>
+						<th>Leasing + Compra</th>
+						<th>Solo Leasing</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for key, value in response["tabla_resumen"].items() %}
+					<tr>
+						<td><strong>{{ key[3:] }}</strong></td>
+						<td class="value">{{ "${:,.2f}".format(value.Compra) }}</td>
+						<td class="value">{{ "${:,.2f}".format(value.Credito) }}</td>
+						<td class="value">{{ "${:,.2f}".format(value['Leasing + compra']) }}</td>
+						<td class="value">{{ "${:,.2f}".format(value['Solo Leasing']) }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div>
+			<h2>Tabla de Amortización</h2>
+			<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(response["renta_mensual_calculada"]) }}</p>
+			<p><strong>Valor Inicial Arrendamiento:</strong> {{ "${:,.2f}".format(response["monto_arrendamiento_siva"]) }}</p>
+			<table>
+				<thead>
+					<tr>
+						<th>Mes</th>
+						<th>Renta Mensual Calculada</th>
+						<th>Interés Pagado</th>
+						<th>Capital Pagado</th>
+						<th>Saldo Pendiente</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in response["tabla_amortizacion"] %}
+					<tr>
+						<td>{{ row.mes }}</td>
+						<td class="value">{{ "${:,.2f}".format(row.renta_mensual_calculada) }}</td>
+						<td class="value">{{ "${:,.2f}".format(row.interes_pagado) }}</td>
+						<td class="value">{{ "${:,.2f}".format(row.capital_pagado) }}</td>
+						<td class="value">{{ "${:,.2f}".format(row.saldo_pendiente) }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+    <div class="containerf">
+        <ul class="conditions-list">
+            <li>* La presente cotización de arrendamiento puro es de caracter informativo y de comparación.</li>
+            <li>* Sujeto a aprobación de crédito.</li>
+            <li>* Cotización sujeta a cambios sin previo aviso</li>
+            <li>* En vehículos, alta vehicular y verificación ambiental NO están contemplados en la presente cotización</li>
+            <li>* Valores expresados en pesos mexicanos</li>
+            <li>* KILOMETRAJE ILIMITADO DURANTE EL PLAZO DEL ARRENDAMIENTO</li>
+            <li>* No incluye seguro</li>
+            <li>* El valor factura del vehiculo esta sujeto a la actualizacion de cada marca</li>
+        </ul>
 
-    <script>
+        <div class="signature-section">
+            <p class="label">ATENTAMENTE</p>
+            <p class="name"></p>
+            <div class="signature-line"></div>
+            <p class="label">Asesor de ventas</p>
+        </div>
+    </div>
+    <div class="containerff">
+        <div class="left-content">
+            <img src="templates/mascota.png" alt="Perro con traje" class="dog-image">
+
+        </div>
+
+        <div class="right-content">
+            <div class="social-title">
+                Síguenos en nuestras redes
+            </div>
+            <div class="social-qrs">
+                <img src="qr-code_fb.png" alt="QR Facebook">
+                <img src="qr-code_ig.png" alt="QR Instagram">
+                <img src="qr-code_ln.png" alt="QR LinkedIn">
+                <img src="qr-code_tik.png" alt="QR TikTok">
+                <img src="qr-code_wa.png" alt="QR WhatsApp">
+            </div>
+        </div>
+    </div>
+    <div class="btn-container">
+        <button onclick="savePageAsPdf()">Guardar como PDF</button>
+    </div>
+	<script>
+	  // Crea un nuevo objeto Date
+	  const fecha = new Date();
+
+	  // Obtiene la fecha como una cadena de texto legible
+	  const fechaTexto = fecha.toLocaleDateString('es-MX', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	  });
+
+	  // Muestra la fecha en el elemento con id "fechaActual"
+	  document.getElementById("fechaActual").innerHTML = fechaTexto;
+	</script>
+	<script>
         function savePageAsPdf() {
             window.print();
         }
