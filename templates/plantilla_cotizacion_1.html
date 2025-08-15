@@ -179,6 +179,20 @@
             height: 90px;
             border: 1px solid #ccc; 
         }
+        /* Estilos específicos para impresión (opcional) */
+        @media print {
+            .btn-container {
+                display: none; /* Oculta el botón de imprimir en el PDF */
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .header, .content {
+                box-shadow: none;
+                background-color: white;
+            }
+        }
 		</style>
 
 </head>
@@ -206,7 +220,7 @@
 	<section class="container">
 		<section class="row">
 			<section class="item">
-				<span class="label">Valor Factura:</span> $ 1,650,000
+				<span class="label">Valor Factura:</span> {{ "${:,.2f}".format(input_lines["valor_factura"]) }}
 			</section>
 			<section class="item">
 				<span class="label">Submarca y versión:</span> GLC 350 e 4MATIC Coupe
@@ -225,7 +239,7 @@
 				<span class="label">Modelo:</span> 2025
 			</section>
 			<section class="item">
-				<span class="label">Período cotizado:</span> <span class="label">48 meses</span>
+				<span class="label">Período cotizado:</span> <span class="label">{{ "{:,.0f}".format(input_lines["plazo_meses"]) }} meses</span>
 			</section>
 		</section>
 	</section>
@@ -235,55 +249,55 @@
 				<span class="label"></span> <span class="value"></span>
 			</div>
 			<div class="item">
-				<span class="label">Valor residual sin IVA:</span> <span class="value">$ 568,965.52</span>
+				<span class="label">Valor residual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["residual_siva"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Valor inicial del arrendamiento:</span> <span class="value">$ 156,817.18</span>
+				<span class="label">Anticipo del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Valor_inicial_arrenda"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">Total pago inicial:</span> <span class="value">$ 203,616.18</span>
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Rentas en depósito con IVA:</span> <span class="value">$ 0</span>
-			</div>
-			<div class="item">
-				<span class="label">Renta mensual sin IVA:</span> <span class="value">$ 30,685</span>
+				<span class="label">Total pago inicial:</span> <span class="value">{{ "${:,.2f}".format(input_lines["pago_inicial_total"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Comisión por apertura:</span> <span class="value">$ 13,099.27</span>
+				<span class="label">Deposito en garantia:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Deposito_garantia"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Seguro anual con IVA:</span> <span class="value">$ 46,799</span>
-			</div>
-			<div class="item">
-				<span class="label">Total de renta con descuento:</span> <span class="value">$ 30,685</span>
+				<span class="label">Renta mensual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_calculada"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Costo de accesorios:</span> <span class="value">$ 0</span>
+				<span class="label">Comisión por apertura:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Comision_apertura_siva"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">IVA de renta:</span> <span class="value">$ 4,909.6</span>
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Descuento_mensual"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Monto del arrendamiento:</span> <span class="value">$ 1,323,025.83</span>
+				<span class="label">Seguro anual con IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["seguro"]) }}</span>
 			</div>
 			<div class="item">
-				<span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
+				<span class="label">Total de renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Costo de accesorios:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Accesorios"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">IVA de renta:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Iva_renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Monto del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Monto_arrendamiento_siva"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Fondo_reserva"]) }}</span>
 			</div>
 		</div>
 		<div class="row">
@@ -291,7 +305,7 @@
 				<span class="label"></span> <span class="value"></span>
 			</div>
 			<div class="item">
-				<span class="label">Total renta mensual con IVA:</span> <span class="value">$ 35,594.6</span>
+				<span class="label">Total renta mensual con IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Total_renta_mensual_descuento"]) }}</span>
 			</div>
 		</div>
 	</div>
@@ -299,82 +313,77 @@
     <div class="container2">
         <div class="option-box">
             <div class="option-title">
-                Opcion de renta #1<br>Plazo a 12 meses
+                Opcion de renta #1<br>Plazo a {{ "{:,.0f}".format(response["Tabla_1"]["Escenario_meses"]) }} meses
             </div>
             <div class="row">
-                <span class="label">Renta:</span> <span class="value">$ 77,966.03</span>
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_calculada"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
+                <span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Descuento_mensual"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta con descuento:</span> <span class="value">$ 77,966.03</span>
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_descuento"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Iva de la renta:</span> <span class="value">$ 12,474.57</span>
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["IVA_renta"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Fondo_reserva"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta mensual total:</span> <span class="value">$ 90,440.6</span>
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_mensual_total"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Valor residual sugerido:</span> <span class="value">$ 711,206.9</span>
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Valor_residual"]) }}</span>
             </div>
         </div>
 
         <div class="option-box">
             <div class="option-title">
-                Opcion de renta #2<br>Plazo a 24 meses
+                Opcion de renta #2<br>Plazo a {{ "{:,.0f}".format(response["Tabla_2"]["Escenario_meses"]) }} meses
             </div>
             <div class="row">
-                <span class="label">Renta:</span> <span class="value">$ 57,654.06</span>
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_calculada"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_descuento"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta con descuento:</span> <span class="value">$ 57,654.06</span>
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["IVA_renta"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Iva de la renta:</span> <span class="value">$ 9,224.65</span>
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Fondo_reserva"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_mensual_total"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta mensual total:</span> <span class="value">$ 66,878.71</span>
-            </div>
-            <div class="row">
-                <span class="label">Valor residual sugerido:</span> <span class="value">$ 568,965.52</span>
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Valor_residual"]) }}</span>
             </div>
         </div>
 
+
         <div class="option-box">
             <div class="option-title">
-                Opcion de renta #3<br>Plazo a 36 meses
+                Opcion de renta #3<br>Plazo a {{ "{:,.0f}".format(response["Tabla_3"]["Escenario_meses"]) }} meses
             </div>
             <div class="row">
-                <span class="label">Renta:</span> <span class="value">$ 49,061.79</span>
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_calculada"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Descuento mensual:</span> <span class="value">$ 0</span>
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_descuento"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta con descuento:</span> <span class="value">$ 49,061.79</span>
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["IVA_renta"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Iva de la renta:</span> <span class="value">$ 7,849.89</span>
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Fondo_reserva"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Fondo de reserva:</span> <span class="value">$ 0</span>
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_mensual_total"]) }}</span>
             </div>
             <div class="row">
-                <span class="label">Renta mensual total:</span> <span class="value">$ 56,911.68</span>
-            </div>
-            <div class="row">
-                <span class="label">Valor residual sugerido:</span> <span class="value">$ 497,844.83</span>
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Valor_residual"]) }}</span>
             </div>
         </div>
     </div>
@@ -416,6 +425,14 @@
             </div>
         </div>
     </div>
-	
+    <div class="btn-container">
+        <button onclick="savePageAsPdf()">Guardar como PDF</button>
+    </div>
+
+    <script>
+        function savePageAsPdf() {
+            window.print();
+        }
+    </script>		
 </body>
 </html>
