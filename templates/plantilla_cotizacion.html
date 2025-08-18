@@ -22,9 +22,18 @@
 			justify-content: space-between;
             padding: 20px;
         }
+		.info-section{
+            box-sizing: border-box;
+		}
         .header, .footer {
             text-align: center;
             margin-bottom: 20px;
+        }
+        .container2h {
+            padding: 15px;
+            width: 970px; 
+            box-sizing: border-box;
+			margin-bottom: 10px;
         }
         .container {
             border: 1px solid #000;
@@ -198,8 +207,13 @@
         /* Estilos específicos para impresión (opcional) */
         @media print {
             .btn-container {
+				background-color: #fff;
                 display: none; /* Oculta el botón de imprimir en el PDF */
             }
+			.print-button {
+				background-color: #04AA6D;
+				font-weight: bold;
+			}
             body {
                 margin: 0;
                 padding: 0;
@@ -213,6 +227,10 @@
 
 </head>
 <body>
+    <div class="btn-container">
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
+    </div>
 		<div class="containerh">
 		    <div class="logo-section">
 				<img src="{{ url_for('static', filename='images/olr-leasing-logo.png') }}" alt="OLR Leasing Logo">
@@ -227,28 +245,40 @@
 			</div>
 
 		</div>
-		<div class="containerh">
+		<div class="container2h">
 			<div class="info-section">
-				<p><strong>Cliente:</strong> {{ (otros_datos["cliente"] if otros_datos["cliente"]!='' else "A quien Corresponda.") }}</p>
-				<p><strong>Atención a:</strong>{{ (otros_datos["atencion"] if otros_datos["atencion"]!='' else "A quien Corresponda.") }}</p>
-				<p><strong>Cotización para:</strong>{{ (otros_datos["tipo_persona"] if otros_datos["tipo_persona"]!='' else "Persona Moral.") }}</p>
+				<section class="row">
+					<section class="item">
+						<span class="label"><strong>Cliente:</strong></span> {{ (otros_datos["cliente"] if otros_datos["cliente"]!='' else "A quien Corresponda.") }}
+					</section>
+					<section class="item">
+						<span class="label"><strong>Atención a:</strong></span>{{ (otros_datos["atencion"] if otros_datos["atencion"]!='' else "A quien Corresponda.") }}
+					</section>
+				</section>
+				<section class="row">
+					<section class="item">
+						<span class="label"><strong>Tipo activo:</strong></span> {{ (input_lines["tipo_activo"] if input_lines["tipo_activo"]!='' else "Auto") }}
+					</section>
+					<section class="item">
+						<span class="label"><strong>Cotización para:</strong></span>{{ (otros_datos["tipo_persona"] if otros_datos["tipo_persona"]!='' else "Persona Moral.") }}
+					</section>
+				</section>
+				<section class="row">
+					<section class="item">
+						<span class="label"><strong>Unidades cotizadas:</strong></span> {{ (otros_datos["unidades"] if otros_datos["unidades"]!='' else "1") }}
+					</section>
+					<section class="item">
+					</section>
+				</section>
 			</div>
 		</div>
 	<section class="container">
 		<section class="row">
 			<section class="item">
-				<span class="label">Valor Factura:</span> {{ "${:,.2f}".format(input_lines["valor_factura"]) }}
-			</section>
-			<section class="item">
-				<span class="label">Submarca y versión:</span>{{ (otros_datos["submarca"] if otros_datos["submarca"]!='' else "Sin especificar.") }}
-			</section>
-		</section>
-		<section class="row">
-			<section class="item">
 				<span class="label">Marca:</span> {{ (otros_datos["marca"] if otros_datos["marca"]!='' else "Sin especificar.") }}
 			</section>
 			<section class="item">
-				<span class="label">Tipo:</span>  {{ (otros_datos["tipo_activo"] if otros_datos["tipo_activo"]!='' else "Nuevo.") }}
+				<span class="label">Valor Factura:</span> {{ "${:,.2f}".format(input_lines["valor_factura"]) }}
 			</section>
 		</section>
 		<section class="row">
@@ -256,30 +286,31 @@
 				<span class="label">Modelo:</span> {{ (otros_datos["modelo"] if otros_datos["modelo"]!='' else "Sin especificar.") }}
 			</section>
 			<section class="item">
-				<span class="label">Período cotizado:</span> <span class="label">{{ "{:,.0f}".format(input_lines["plazo_meses"]) }} meses</span>
+				<span class="label">Costo de accesorios:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Accesorios"]) }}</span>
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Submarca y versión:</span>{{ (otros_datos["submarca"] if otros_datos["submarca"]!='' else "Sin especificar.") }}
+			</section>
+			<section class="item">
+				<span class="label">Descripcion accesorios:</span>{{ (otros_datos["descripcion"] if otros_datos["descripcion"]!='' else "Sin especificar.") }}
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Tipo:</span>  {{ (otros_datos["edad_vehiculo"] if otros_datos["edad_vehiculo"]!='' else "Nuevo.") }}
+			</section>
+			<section class="item">
+				<span class="label">Período cotizado:</span>{{ "{:,.0f}".format(input_lines["plazo_meses"]) }} meses
 			</section>
 		</section>
 	</section>
+	
 	<div class="container">
 		<div class="row">
 			<div class="item">
-				<span class="label"></span> <span class="value"></span>
-			</div>
-			<div class="item">
-				<span class="label">Valor residual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["residual_siva"]) }}</span>
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Anticipo del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Valor_inicial_arrenda"]) }}</span>
-			</div>
-			<div class="item">
-				<span class="label">Total pago inicial:</span> <span class="value">{{ "${:,.2f}".format(input_lines["pago_inicial_total"]) }}</span>
-			</div>
-		</div>
-		<div class="row">
-			<div class="item">
-				<span class="label">Deposito en garantia:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Deposito_garantia"]) }}</span>
+				<span class="label">Monto del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Monto_arrendamiento_siva"]) }}</span>
 			</div>
 			<div class="item">
 				<span class="label">Renta mensual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_calculada"]) }}</span>
@@ -287,7 +318,7 @@
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Comisión por apertura:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Comision_apertura_siva"]) }}</span>
+				<span class="label">Anticipo del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Valor_inicial_arrenda"]) }}</span>
 			</div>
 			<div class="item">
 				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Descuento_mensual"]) }}</span>
@@ -295,7 +326,7 @@
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Seguro anual con IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["seguro"]) }}</span>
+				<span class="label">Deposito en garantia:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Deposito_garantia"]) }}</span>
 			</div>
 			<div class="item">
 				<span class="label">Total de renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_descuento"]) }}</span>
@@ -303,7 +334,7 @@
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Costo de accesorios:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Accesorios"]) }}</span>
+				<span class="label">Seguro anual:</span> <span class="value">{{ "${:,.2f}".format(input_lines["seguro"]) }}</span>
 			</div>
 			<div class="item">
 				<span class="label">IVA de renta:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Iva_renta_mensual_descuento"]) }}</span>
@@ -311,7 +342,7 @@
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label">Monto del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Monto_arrendamiento_siva"]) }}</span>
+				<span class="label">Total pago inicial:</span> <span class="value">{{ "${:,.2f}".format(input_lines["pago_inicial_total"]) }}</span>
 			</div>
 			<div class="item">
 				<span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Fondo_reserva"]) }}</span>
@@ -319,10 +350,15 @@
 		</div>
 		<div class="row">
 			<div class="item">
-				<span class="label"></span> <span class="value"></span>
+				<span class="label">Comisión por apertura:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Comision_apertura_siva"]) }}</span>
 			</div>
 			<div class="item">
 				<span class="label">Total renta mensual con IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Total_renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Valor residual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["residual_siva"]) }}</span>
 			</div>
 		</div>
 	</div>
@@ -451,7 +487,8 @@
         </div>
     </div>
     <div class="btn-container">
-        <button onclick="savePageAsPdf()">Guardar como PDF</button>
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
     </div>
 <div style="page-break-after: always;"></div>
 		<div class="containerh">
@@ -558,7 +595,8 @@
         </div>
     </div>
     <div class="btn-container">
-        <button onclick="savePageAsPdf()">Guardar como PDF</button>
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
     </div>
 	<script>
 	  // Crea un nuevo objeto Date
