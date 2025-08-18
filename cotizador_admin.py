@@ -269,22 +269,24 @@ def cotizador():
             
             cliente = request.form.get('cliente', '')
             atencion = request.form.get('atencion', '')
-            tipo_activo = request.form.get('tipo_activo', '')
+            edad_vehiculo = request.form.get('edad_vehiculo', '')
             tipo_persona = request.form.get('tipo_persona','')
             unidades = request.form.get('unidades', '')
             marca = request.form.get('marca', '')
             modelo = request.form.get('modelo', '')
             submarca = request.form.get('submarca', '')
+            descripcion = request.form.get('descripcion', '')
             
             otros_datos = {
                 "cliente": cliente,
                 "atencion": atencion,
-                "tipo_activo": tipo_activo,
+                "edad_vehiculo": edad_vehiculo,
                 "tipo_persona": tipo_persona,
                 "unidades": unidades,
                 "marca": marca,
                 "modelo": modelo,
-                "submarca": submarca
+                "submarca": submarca,
+                "descripcion": descripcion
                 }
             
             session["otros_datos"] = otros_datos
