@@ -314,6 +314,7 @@ def cotizador_optimo():
             total_deducible_fiscal_leasing_compra = total_deducible_fiscal_leasing + (max_valor_deducible if residual_siva > max_valor_deducible else residual_siva)
             valor_comercial_esperado = valor_factura*(1-(disminucion_valor/12))**plazo_meses
             total_pagado_plan_leasing_compra = total_pagado_plan_solo_leasing + valor_residual
+            ahorro_isr_esperado_leasing = total_deducible_fiscal_leasing_compra*isr
             total_iva_acreditable_leasing_compra = total_iva_acreditable_leasing + iva_residual
             ahorro_compra = valor_comercial_esperado - valor_residual
             beneficio_leasing_compra = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing_compra + ahorro_compra + devolucion_deposito_garantia
