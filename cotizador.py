@@ -311,6 +311,7 @@ def cotizador_optimo():
             costo_neto_solo_leasing = total_pagado_plan_solo_leasing - beneficio_solo_leasing
             
             #[leasing_compra]
+            total_deducible_fiscal_leasing_compra = total_deducible_fiscal_leasing + (max_valor_deducible if residual_siva > max_valor_deducible else residual_siva)
             valor_comercial_esperado = valor_factura*(1-(disminucion_valor/12))**plazo_meses
             total_pagado_plan_leasing_compra = total_pagado_plan_solo_leasing + valor_residual
             total_iva_acreditable_leasing_compra = total_iva_acreditable_leasing + iva_residual
@@ -340,7 +341,7 @@ def cotizador_optimo():
             
             tabla_resumen = {"01.Total Deducible Fiscal": {
                     "Solo Leasing": round(total_deducible_fiscal_leasing, 2),
-                    "Leasing + compra": round(total_deducible_fiscal_leasing, 2),
+                    "Leasing + compra": round(total_deducible_fiscal_leasing_compra, 2),
                     "Credito": round(total_deducible_fiscal_credito, 2),
                     "Compra": round(total_deducible_fiscal_credito, 2)
                     },
@@ -600,13 +601,13 @@ def cotizador_optimo():
                 set_plazos = [24, 36, 48]
                 
             #Escenario 12 meses
-            tabla_1 = calculo_escenario (set_plazos[0], cat_otros_gastos, cat_valor_residual, variables_escenario, True)
+            tabla_1 = calculo_escenario (set_plazos[0], cat_otros_gastos, cat_valor_residual, variables_escenario, False)
 
             #Escenario 24 meses
-            tabla_2 = calculo_escenario (set_plazos[1], cat_otros_gastos, cat_valor_residual, variables_escenario, True)
+            tabla_2 = calculo_escenario (set_plazos[1], cat_otros_gastos, cat_valor_residual, variables_escenario, False)
 
             #Escenario 36 meses
-            tabla_3 = calculo_escenario (set_plazos[2], cat_otros_gastos, cat_valor_residual, variables_escenario, True)
+            tabla_3 = calculo_escenario (set_plazos[2], cat_otros_gastos, cat_valor_residual, variables_escenario, False)
 
             
             tabla_cotizacion = {
