@@ -10,3 +10,4 @@ test_setup.py
 config_admin.info
 config_app.info
 /pruebas
+*.info

@@ -10,7 +10,7 @@
     "num_parametros_facturacion": 10
   },
   "credito": {
-    "tasa_credito": 28,
+    "tasa_credito": 14,
     "tasa_enganche": 10
   },
   "fiscal": {
