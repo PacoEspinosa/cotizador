@@ -236,7 +236,7 @@ def cotizador_optimo():
         iva_otros_gastos = otros_gastos_siva*iva
         otros_gastos = otros_gastos_siva + iva_otros_gastos
         #if (pago_inicial_total-seguro) > (valor_siva*precio_activo) and deposito_garantia == 0:
-        if (pago_inicial_total-seguro) > (valor_siva*precio_activo):
+        if (pago_inicial_total-seguro-deposito_garantia) > (valor_siva*precio_activo):
             if es_inversion:
                 return jsonify({"error": "El pago inicial genera un valor mayor al permitido y ya se tiene un deposito en inversion."}), 400
             else:
@@ -313,11 +313,11 @@ def cotizador_optimo():
             #[leasing_compra]
             total_deducible_fiscal_leasing_compra = total_deducible_fiscal_leasing + (max_valor_deducible if residual_siva > max_valor_deducible else residual_siva)
             valor_comercial_esperado = valor_factura*(1-(disminucion_valor/12))**plazo_meses
-            total_pagado_plan_leasing_compra = total_pagado_plan_solo_leasing + valor_residual
+            total_pagado_plan_leasing_compra = total_pagado_plan_solo_leasing + residual_siva
             ahorro_isr_esperado_leasing_compra = total_deducible_fiscal_leasing_compra*isr
             total_iva_acreditable_leasing_compra = total_iva_acreditable_leasing + iva_residual
-            ahorro_compra = valor_comercial_esperado - valor_residual
-            beneficio_leasing_compra = ahorro_isr_esperado_leasing + total_iva_acreditable_leasing_compra + ahorro_compra + devolucion_deposito_garantia
+            ahorro_compra = (0 if valor_comercial_esperado < valor_residual else valor_comercial_esperado - valor_residual)
+            beneficio_leasing_compra = ahorro_isr_esperado_leasing_compra + total_iva_acreditable_leasing_compra + ahorro_compra + devolucion_deposito_garantia
             costo_neto_leasing_compra = total_pagado_plan_leasing_compra - beneficio_leasing_compra
             
             #[Credito]
