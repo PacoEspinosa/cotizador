@@ -288,6 +288,7 @@
 							</tr>
 						</thead>
 						<tbody>
+						{% set total = namespace(capital=0, intereses=0, residual =0, pago_capital=0) %}
 							{% for key, value in api_response.tabla_interna.items() %}
 							<tr>
 								<td><strong>{{ key }}</strong></td>
@@ -298,8 +299,22 @@
 								<td class="value">{{ "${:,.2f}".format(value.pago_residual) }}</td>
 								<td class="value">{{ "${:,.2f}".format(value.capital_vigente) }}</td>
 								<td class="value">{{ "${:,.2f}".format(value.pago_capital) }}</td>
+								{% set total.capital = total.capital + value.ingresos_capital %}
+								{% set total.intereses = total.intereses + value.ingresos_intereses %}
+								{% set total.residual = total.residual + value.pago_residual %}
+								{% set total.pago_capital = total.pago_capital + value.pago_capital %}
 							</tr>
 							{% endfor %}
+							<tr>
+								<td><strong>Totales:</strong></td>
+								<td class="value">-</td>
+								<td class="value">-</td>
+								<td class="value">{{ "${:,.2f}".format(total.capital) }}</td>
+								<td class="value">{{ "${:,.2f}".format(total.intereses) }}</td>
+								<td class="value">{{ "${:,.2f}".format(total.residual) }}</td>
+								<td class="value">-</td>
+								<td class="value">{{ "${:,.2f}".format(total.pago_capital) }}</td>
+							</tr>
 						</tbody>
 					</table>
 				{% else %}
