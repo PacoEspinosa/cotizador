@@ -330,8 +330,11 @@ def open_popup():
     pero en este ejemplo, la apertura del popup es manejada por JavaScript
     en el lado del cliente. Podrías usar esta ruta para enviar datos dinámicos.
     """
-    
-    return render_template('plantilla_cotizacion.html', input_lines=session["payload"], response = session["api_response"], otros_datos = session["otros_datos"])
+    list_long = int(len(session["api_response"]["tabla_amortizacion"])/2)
+    arrange = range(list_long)
+
+    return render_template('plantilla_cotizacion.html', input_lines=session["payload"], response = session["api_response"], otros_datos = session["otros_datos"], 
+                           arrange = arrange, list_long = list_long)
 
 if __name__ == '__main__':
     app.run(debug=True,port=5001)

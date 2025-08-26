@@ -18,16 +18,16 @@
         .containerh {
             width: 970px;
 			display: flex;
-            margin: 0 auto;
+            margin: 0 Auto;
 			justify-content: space-between;
-            padding: 20px;
+            padding: 10px;
         }
 		.info-section{
             box-sizing: border-box;
 		}
         .header, .footer {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .container2h {
             padding: 15px;
@@ -134,7 +134,7 @@
             margin-right: 20px; /* Space between logo and text */
         }
         .logo-section img {
-            height: 100px; /* Adjust logo height as needed */
+            height: 120px; /* Adjust logo height as needed */
             width: auto;
         }
         .date-section {
@@ -142,7 +142,7 @@
             margin-left: 20px;
 			display: flex;
             flex-direction: column;
-			justify-content: flex-end;
+			justify-content: center;
         }
         .date-section p {
             margin: 0;
@@ -191,7 +191,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
             background-color: #fff;
 			font-size: 10px;
         }
@@ -241,7 +241,7 @@
 			</div>
 			<div class="date-section">
 				<p>Fecha</p>
-				<p id="fechaActual"></p>
+				<p class="fechaActual"></p>
 			</div>
 
 		</div>
@@ -504,11 +504,163 @@
 			</div>
 			<div class="date-section">
 				<p>Fecha</p>
-				<p id="fechaActual"></p>
+				<p class="fechaActual"></p>
 			</div>
 		</div>
 		<div>
-			<h2>Tabla de Resumen</h2>
+			<h5>Tabla de Amortización</h5>
+			<p style="font-size: 12px;">
+				<strong>Renta Mensual Calculada:</strong> 
+				{{ "${:,.2f}".format(response["renta_mensual_calculada"]) }}
+				<strong>Valor Inicial Arrendamiento:</strong> 
+				{{ "${:,.2f}".format(response["monto_arrendamiento_siva"]) }}
+			</p>
+			{% if response["tabla_amortizacion"]|length <= 30 %}
+				<table>
+					<thead>
+						<tr>
+							<th>Mes</th>
+							<th>Renta Mensual Calculada</th>
+							<th>Interés Pagado</th>
+							<th>Capital Pagado</th>
+							<th>Saldo Pendiente</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for row in response["tabla_amortizacion"] %}
+						<tr>
+							<td>{{ row.mes }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.renta_mensual_calculada) }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.interes_pagado) }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.capital_pagado) }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.saldo_pendiente) }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<table>
+					<thead>
+						<tr>
+							<th>Mes</th>
+							<th>Renta Mensual Calculada</th>
+							<th>Interés Pagado</th>
+							<th>Capital Pagado</th>
+							<th>Saldo Pendiente</th>
+							<th></th>
+							<th>Mes</th>
+							<th>Renta Mensual Calculada</th>
+							<th>Interés Pagado</th>
+							<th>Capital Pagado</th>
+							<th>Saldo Pendiente</th>
+						</tr>
+					</thead>
+					<tbody>
+					<tbody>
+						{% for row1 in arrange %}
+						<tr>
+							<td>{{ response["tabla_amortizacion"][row1]["mes"] }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["renta_mensual_calculada"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["interes_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["capital_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["saldo_pendiente"]) }}</td>
+							<td></td>
+							{% if response["tabla_amortizacion"]|length%2 != 0 %}
+								<td>{{ response["tabla_amortizacion"][row1 + list_long + 1]["mes"] }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["renta_mensual_calculada"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["interes_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["capital_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["saldo_pendiente"]) }}</td>
+							{% else %}
+								<td>{{ response["tabla_amortizacion"][row1 + list_long]["mes"] }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["renta_mensual_calculada"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["interes_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["capital_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["saldo_pendiente"]) }}</td>
+							{% endif %}
+						</tr>
+						{% endfor %}
+						{% if response["tabla_amortizacion"]|length%2 != 0 %}
+						<tr>
+							<td>{{ response["tabla_amortizacion"][list_long]["mes"] }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["renta_mensual_calculada"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["interes_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["capital_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["saldo_pendiente"]) }}</td>
+							<td></td>
+							<td></td>
+							<td class="value"></td>
+							<td class="value"></td>
+							<td class="value"></td>
+							<td class="value"></td>
+						</tr>
+						{% endif %}
+					</tbody>
+				</table>
+			{% endif %}
+		</div>
+	{% if response["tabla_amortizacion"]|length > 15 %}
+    <div class="containerf">
+        <ul class="conditions-list">
+            <li>* La presente cotización de arrendamiento puro es de caracter informativo y de comparación.</li>
+            <li>* Sujeto a aprobación de crédito.</li>
+            <li>* Cotización sujeta a cambios sin previo aviso</li>
+            <li>* En vehículos, alta vehicular y verificación ambiental NO están contemplados en la presente cotización</li>
+            <li>* Valores expresados en pesos mexicanos</li>
+            <li>* KILOMETRAJE ILIMITADO DURANTE EL PLAZO DEL ARRENDAMIENTO</li>
+            <li>* No incluye seguro</li>
+            <li>* El valor factura del vehiculo esta sujeto a la actualizacion de cada marca</li>
+        </ul>
+
+        <div class="signature-section">
+            <p class="label">ATENTAMENTE</p>
+            <p class="name"></p>
+            <div class="signature-line"></div>
+            <p class="label">Asesor de ventas</p>
+        </div>
+    </div>
+	{% if response["tabla_amortizacion"]|length < 57 and response["tabla_amortizacion"]|length != 30 %}
+    <div class="containerff">
+        <div class="left-content">
+            <img src="{{ url_for('static', filename='images/mascota.png') }}" alt="Perro con traje" class="dog-image">
+
+        </div>
+
+        <div class="right-content">
+            <div class="social-title">
+                Síguenos en nuestras redes
+            </div>
+            <div class="social-qrs">
+                <img src="{{ url_for('static', filename='images/qr-code_fb.png') }}" alt="QR Facebook">
+                <img src="{{ url_for('static', filename='images/qr-code_ig.png') }}" alt="QR Instagram">
+                <img src="{{ url_for('static', filename='images/qr-code_ln.png') }}" alt="QR LinkedIn">
+                <img src="{{ url_for('static', filename='images/qr-code_tik.png') }}" alt="QR TikTok">
+                <img src="{{ url_for('static', filename='images/qr-code_wa.png') }}" alt="QR WhatsApp">
+            </div>
+        </div>
+    </div>
+    <div class="btn-container">
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
+    </div>
+	{% endif %}
+<div style="page-break-after: always;"></div>
+		<div class="containerh">
+		    <div class="logo-section">
+				<img src="{{ url_for('static', filename='images/olr-leasing-logo.png') }}" alt="OLR Leasing Logo">
+			</div>
+			<div class="header">
+				<h1>OLR LEASING SAPI DE CV</h1>
+				<h2>Arrendamiento Puro</h2>
+			</div>
+			<div class="date-section">
+				<p>Fecha</p>
+				<p class="fechaActual"></p>
+			</div>
+		</div>		
+	{% endif %}
+		<div>
+			<h5>Tabla de Resumen</h5>
 			<table>
 				<thead>
 					<tr>
@@ -522,38 +674,14 @@
 				<tbody>
 					{% for key, value in response["tabla_resumen"].items() %}
 					<tr>
+						{% if key[3:] in ['Rendimiento','Valor Comercial Proyectado','Total Pagado Plan','Beneficio total'] %}
+						{% else %}
 						<td><strong>{{ key[3:] }}</strong></td>
 						<td class="value">{{ "${:,.2f}".format(value.Compra) }}</td>
 						<td class="value">{{ "${:,.2f}".format(value.Credito) }}</td>
 						<td class="value">{{ "${:,.2f}".format(value['Leasing + compra']) }}</td>
 						<td class="value">{{ "${:,.2f}".format(value['Solo Leasing']) }}</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-		<div>
-			<h2>Tabla de Amortización</h2>
-			<p><strong>Renta Mensual Calculada:</strong> {{ "${:,.2f}".format(response["renta_mensual_calculada"]) }}</p>
-			<p><strong>Valor Inicial Arrendamiento:</strong> {{ "${:,.2f}".format(response["monto_arrendamiento_siva"]) }}</p>
-			<table>
-				<thead>
-					<tr>
-						<th>Mes</th>
-						<th>Renta Mensual Calculada</th>
-						<th>Interés Pagado</th>
-						<th>Capital Pagado</th>
-						<th>Saldo Pendiente</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for row in response["tabla_amortizacion"] %}
-					<tr>
-						<td>{{ row.mes }}</td>
-						<td class="value">{{ "${:,.2f}".format(row.renta_mensual_calculada) }}</td>
-						<td class="value">{{ "${:,.2f}".format(row.interes_pagado) }}</td>
-						<td class="value">{{ "${:,.2f}".format(row.capital_pagado) }}</td>
-						<td class="value">{{ "${:,.2f}".format(row.saldo_pendiente) }}</td>
+						{% endif %}
 					</tr>
 					{% endfor %}
 				</tbody>
@@ -596,7 +724,7 @@
                 <img src="{{ url_for('static', filename='images/qr-code_wa.png') }}" alt="QR WhatsApp">
             </div>
         </div>
-    </div>
+    </div>	
     <div class="btn-container">
 		<br>
         <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
@@ -613,7 +741,10 @@
 	  });
 
 	  // Muestra la fecha en el elemento con id "fechaActual"
-	  document.getElementById("fechaActual").innerHTML = fechaTexto;
+	  const elementosFechaActual = document.querySelectorAll('.fechaActual');
+	  elementosFechaActual.forEach(elemento => {
+		elemento.innerText = fechaTexto;
+	  });
 	</script>
 	<script>
         function savePageAsPdf() {
