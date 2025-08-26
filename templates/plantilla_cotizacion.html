@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotización de Leasing - Mercedes-Benz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+			flex-direction: column;  
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .containerh {
+            width: 970px;
+			display: flex;
+            margin: 0 Auto;
+			justify-content: space-between;
+            padding: 10px;
+        }
+		.info-section{
+            box-sizing: border-box;
+		}
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .container2h {
+            padding: 15px;
+            width: 970px; 
+            box-sizing: border-box;
+			margin-bottom: 10px;
+        }
+        .container {
+            border: 1px solid #000;
+            padding: 15px;
+            width: 970px; 
+            box-sizing: border-box;
+            background-color: #fff;
+			margin-bottom: 10px;
+        }
+        .container2 {
+            display: flex;
+            gap: 20px; /* Space between the three columns */
+        }
+		.option-box {
+            border: 1px solid #000;
+            padding: 15px;
+            width: 310px; /* Adjust width as needed for each box */
+            box-sizing: border-box;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        .option-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px; 
+            align-items: flex-end; 
+        }
+        .row:last-child {
+            margin-bottom: 0;
+        }
+        .item {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            padding-right: 20px; 
+            white-space: nowrap; 
+        }
+        .item:last-child {
+            padding-right: 0;
+        }
+        .label {
+            text-align: left;
+            flex-grow: 1; 
+        }
+        .value {
+            text-align: right;
+            margin-left: 10px; 
+        }
+        .containerf {
+            display: flex;
+            justify-content: space-between;
+            width: 970px; 
+            padding: 10px;
+        }
+        .conditions-list {
+            flex: 2; 
+            list-style: none; 
+            padding: 0;
+            margin: 0;
+            font-size: 0.6em;
+            line-height: 1.4;
+        }
+        .conditions-list li {
+            margin-bottom: 5px;
+        }
+        .signature-section {
+            flex: 1; 
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; 
+            padding-top: 20px; 
+        }
+        .signature-section p {
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+        }
+        .signature-section .label {
+            font-size: 0.9em;
+        }
+        .signature-section .name {
+            font-size: 1.1em;
+            margin-bottom: 5px; /* Space between name and line */
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            width: 150px; /* Adjust line width as needed */
+        }
+        .logo-section {
+            flex-shrink: 0; /* Prevent logo from shrinking */
+            margin-right: 20px; /* Space between logo and text */
+        }
+        .logo-section img {
+            height: 120px; /* Adjust logo height as needed */
+            width: auto;
+        }
+        .date-section {
+            text-align: right;
+            margin-left: 20px;
+			display: flex;
+            flex-direction: column;
+			justify-content: center;
+        }
+        .date-section p {
+            margin: 0;
+            font-size: 1em;
+            color: #333;
+        }
+        .date-section .date-value {
+            font-weight: normal; 
+        }
+        .containerff {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            align-items: flex-start;
+            justify-content: space-between;
+        }         .left-content {
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+        }
+        .dog-image {
+            width: 200px;
+            height: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .right-content {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .social-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .social-qrs {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        .social-qrs img {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ccc; 
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #fff;
+			font-size: 10px;
+        }
+        th, td {
+            padding: 5px 5px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        /* Estilos específicos para impresión (opcional) */
+        @media print {
+            .btn-container {
+				background-color: #fff;
+                display: none; /* Oculta el botón de imprimir en el PDF */
+            }
+			.print-button {
+				background-color: #04AA6D;
+				font-weight: bold;
+			}
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .header, .content {
+                box-shadow: none;
+                background-color: white;
+            }
+        }
+		</style>
+
+</head>
+<body>
+    <div class="btn-container">
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
+    </div>
+		<div class="containerh">
+		    <div class="logo-section">
+				<img src="{{ url_for('static', filename='images/olr-leasing-logo.png') }}" alt="OLR Leasing Logo">
+			</div>
+			<div class="header">
+				<h1>OLR LEASING SAPI DE CV</h1>
+				<h2>Arrendamiento Puro</h2>
+			</div>
+			<div class="date-section">
+				<p>Fecha</p>
+				<p class="fechaActual"></p>
+			</div>
+
+		</div>
+		<div class="container2h">
+			<div class="info-section">
+				<section class="row">
+					<section class="item">
+						<span class="label"><strong>Cliente:</strong></span> {{ (otros_datos["cliente"] if otros_datos["cliente"]!='' else "A quien Corresponda.") }}
+					</section>
+					<section class="item">
+						<span class="label"><strong>Atención a:</strong></span>{{ (otros_datos["atencion"] if otros_datos["atencion"]!='' else "A quien Corresponda.") }}
+					</section>
+				</section>
+				<section class="row">
+					<section class="item">
+						<span class="label"><strong>Tipo activo:</strong></span> {{ (input_lines["tipo_activo"] if input_lines["tipo_activo"]!='' else "Auto") }}
+					</section>
+					<section class="item">
+						<span class="label"><strong>Cotización para:</strong></span>{{ (otros_datos["tipo_persona"] if otros_datos["tipo_persona"]!='' else "Persona Moral.") }}
+					</section>
+				</section>
+				<section class="row">
+					<section class="item">
+						<span class="label"><strong>Unidades cotizadas:</strong></span> {{ (otros_datos["unidades"] if otros_datos["unidades"]!='' else "1") }}
+					</section>
+					<section class="item">
+					</section>
+				</section>
+			</div>
+		</div>
+	<section class="container">
+		<section class="row">
+			<section class="item">
+				<span class="label">Marca:</span> {{ (otros_datos["marca"] if otros_datos["marca"]!='' else "Sin especificar.") }}
+			</section>
+			<section class="item">
+				<span class="label">Valor Factura:</span> {{ "${:,.2f}".format(input_lines["valor_factura"]) }}
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Modelo:</span> {{ (otros_datos["modelo"] if otros_datos["modelo"]!='' else "Sin especificar.") }}
+			</section>
+			<section class="item">
+				<span class="label">Costo de accesorios:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Accesorios"]) }}</span>
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Submarca y versión:</span>{{ (otros_datos["submarca"] if otros_datos["submarca"]!='' else "Sin especificar.") }}
+			</section>
+			<section class="item">
+				<span class="label">Descripcion accesorios:</span>{{ (otros_datos["descripcion"] if otros_datos["descripcion"]!='' else "Sin especificar.") }}
+			</section>
+		</section>
+		<section class="row">
+			<section class="item">
+				<span class="label">Tipo:</span>  {{ (otros_datos["edad_vehiculo"] if otros_datos["edad_vehiculo"]!='' else "Nuevo.") }}
+			</section>
+			<section class="item">
+				<span class="label">Período cotizado:</span>{{ "{:,.0f}".format(input_lines["plazo_meses"]) }} meses
+			</section>
+		</section>
+	</section>
+	
+	<div class="container">
+		<div class="row">
+			<div class="item">
+				<span class="label">Monto del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Monto_arrendamiento_siva"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Renta mensual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_calculada"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Anticipo del arrendamiento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Valor_inicial_arrenda"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Descuento_mensual"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Deposito en garantia:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Deposito_garantia"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Total de renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Seguro anual:</span> <span class="value">{{ "${:,.2f}".format(input_lines["seguro"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">IVA de renta:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Iva_renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Total pago inicial:</span> <span class="value">{{ "${:,.2f}".format(input_lines["pago_inicial_total"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Fondo_reserva"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Comisión por apertura:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Comision_apertura_siva"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label">Total renta mensual con IVA:</span> <span class="value">{{ "${:,.2f}".format(response["tabla_cotizacion"]["Total_renta_mensual_descuento"]) }}</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="item">
+				<span class="label">Valor residual sin IVA:</span> <span class="value">{{ "${:,.2f}".format(input_lines["residual_siva"]) }}</span>
+			</div>
+			<div class="item">
+				<span class="label"></span> <span class="value"></span>
+			</div>
+		</div>
+	</div>
+
+    <div class="container2">
+        <div class="option-box">
+            <div class="option-title">
+                Opcion de renta #1<br>Plazo a {{ "{:,.0f}".format(response["Tabla_1"]["Escenario_meses"]) }} meses
+            </div>
+            <div class="row">
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_calculada"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Descuento_mensual"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_descuento"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["IVA_renta"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Fondo_reserva"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Renta_mensual_total"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_1"]["Valor_residual"]) }}</span>
+            </div>
+        </div>
+
+        <div class="option-box">
+            <div class="option-title">
+                Opcion de renta #2<br>Plazo a {{ "{:,.0f}".format(response["Tabla_2"]["Escenario_meses"]) }} meses
+            </div>
+            <div class="row">
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_calculada"]) }}</span>
+            </div>
+			<div class="row">
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Descuento_mensual"]) }}</span>
+			</div>
+            <div class="row">
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_descuento"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["IVA_renta"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Fondo_reserva"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Renta_mensual_total"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_2"]["Valor_residual"]) }}</span>
+            </div>
+        </div>
+
+
+        <div class="option-box">
+            <div class="option-title">
+                Opcion de renta #3<br>Plazo a {{ "{:,.0f}".format(response["Tabla_3"]["Escenario_meses"]) }} meses
+            </div>
+            <div class="row">
+                <span class="label">Renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_calculada"]) }}</span>
+            </div>
+			<div class="row">
+				<span class="label">Descuento mensual:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Descuento_mensual"]) }}</span>
+			</div>
+            <div class="row">
+                <span class="label">Renta con descuento:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_descuento"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Iva de la renta:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["IVA_renta"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Fondo de reserva:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Fondo_reserva"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Renta mensual total:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Renta_mensual_total"]) }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Valor residual sugerido:</span> <span class="value">{{ "${:,.2f}".format(response["Tabla_3"]["Valor_residual"]) }}</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="containerf">
+        <ul class="conditions-list">
+            <li>* La presente cotización de arrendamiento puro es de caracter informativo y de comparación.</li>
+            <li>* Sujeto a aprobación de crédito.</li>
+            <li>* Cotización sujeta a cambios sin previo aviso</li>
+            <li>* En vehículos, alta vehicular y verificación ambiental NO están contemplados en la presente cotización</li>
+            <li>* Valores expresados en pesos mexicanos</li>
+            <li>* KILOMETRAJE ILIMITADO DURANTE EL PLAZO DEL ARRENDAMIENTO</li>
+            <li>* No incluye seguro</li>
+            <li>* El valor factura del vehiculo esta sujeto a la actualizacion de cada marca</li>
+        </ul>
+
+        <div class="signature-section">
+            <p class="label">ATENTAMENTE</p>
+            <p class="name"></p>
+            <div class="signature-line"></div>
+            <p class="label">Asesor de ventas</p>
+        </div>
+    </div>
+    <div class="containerff">
+        <div class="left-content">
+            <img src="{{ url_for('static', filename='images/mascota.png') }}" alt="Perro con traje" class="dog-image">
+
+        </div>
+
+        <div class="right-content">
+            <div class="social-title">
+                Síguenos en nuestras redes
+            </div>
+            <div class="social-qrs">
+                <img src="{{ url_for('static', filename='images/qr-code_fb.png') }}" alt="QR Facebook">
+                <img src="{{ url_for('static', filename='images/qr-code_ig.png') }}" alt="QR Instagram">
+                <img src="{{ url_for('static', filename='images/qr-code_ln.png') }}" alt="QR LinkedIn">
+                <img src="{{ url_for('static', filename='images/qr-code_tik.png') }}" alt="QR TikTok">
+                <img src="{{ url_for('static', filename='images/qr-code_wa.png') }}" alt="QR WhatsApp">
+            </div>
+        </div>
+    </div>
+    <div class="btn-container">
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
+    </div>
+<div style="page-break-after: always;"></div>
+		<div class="containerh">
+		    <div class="logo-section">
+				<img src="{{ url_for('static', filename='images/olr-leasing-logo.png') }}" alt="OLR Leasing Logo">
+			</div>
+			<div class="header">
+				<h1>OLR LEASING SAPI DE CV</h1>
+				<h2>Arrendamiento Puro</h2>
+			</div>
+			<div class="date-section">
+				<p>Fecha</p>
+				<p class="fechaActual"></p>
+			</div>
+		</div>
+		<div>
+			<h5>Tabla de Amortización</h5>
+			<p style="font-size: 12px;">
+				<strong>Renta Mensual Calculada:</strong> 
+				{{ "${:,.2f}".format(response["renta_mensual_calculada"]) }}
+				<strong>Valor Inicial Arrendamiento:</strong> 
+				{{ "${:,.2f}".format(response["monto_arrendamiento_siva"]) }}
+			</p>
+			{% if response["tabla_amortizacion"]|length <= 30 %}
+				<table>
+					<thead>
+						<tr>
+							<th>Mes</th>
+							<th>Renta Mensual Calculada</th>
+							<th>Interés Pagado</th>
+							<th>Capital Pagado</th>
+							<th>Saldo Pendiente</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for row in response["tabla_amortizacion"] %}
+						<tr>
+							<td>{{ row.mes }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.renta_mensual_calculada) }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.interes_pagado) }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.capital_pagado) }}</td>
+							<td class="value">{{ "${:,.2f}".format(row.saldo_pendiente) }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<table>
+					<thead>
+						<tr>
+							<th>Mes</th>
+							<th>Renta Mensual Calculada</th>
+							<th>Interés Pagado</th>
+							<th>Capital Pagado</th>
+							<th>Saldo Pendiente</th>
+							<th></th>
+							<th>Mes</th>
+							<th>Renta Mensual Calculada</th>
+							<th>Interés Pagado</th>
+							<th>Capital Pagado</th>
+							<th>Saldo Pendiente</th>
+						</tr>
+					</thead>
+					<tbody>
+					<tbody>
+						{% for row1 in arrange %}
+						<tr>
+							<td>{{ response["tabla_amortizacion"][row1]["mes"] }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["renta_mensual_calculada"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["interes_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["capital_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1]["saldo_pendiente"]) }}</td>
+							<td></td>
+							{% if response["tabla_amortizacion"]|length%2 != 0 %}
+								<td>{{ response["tabla_amortizacion"][row1 + list_long + 1]["mes"] }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["renta_mensual_calculada"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["interes_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["capital_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long + 1]["saldo_pendiente"]) }}</td>
+							{% else %}
+								<td>{{ response["tabla_amortizacion"][row1 + list_long]["mes"] }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["renta_mensual_calculada"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["interes_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["capital_pagado"]) }}</td>
+								<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][row1 + list_long]["saldo_pendiente"]) }}</td>
+							{% endif %}
+						</tr>
+						{% endfor %}
+						{% if response["tabla_amortizacion"]|length%2 != 0 %}
+						<tr>
+							<td>{{ response["tabla_amortizacion"][list_long]["mes"] }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["renta_mensual_calculada"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["interes_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["capital_pagado"]) }}</td>
+							<td class="value">{{ "${:,.2f}".format(response["tabla_amortizacion"][list_long]["saldo_pendiente"]) }}</td>
+							<td></td>
+							<td></td>
+							<td class="value"></td>
+							<td class="value"></td>
+							<td class="value"></td>
+							<td class="value"></td>
+						</tr>
+						{% endif %}
+					</tbody>
+				</table>
+			{% endif %}
+		</div>
+	{% if response["tabla_amortizacion"]|length > 15 %}
+    <div class="containerf">
+        <ul class="conditions-list">
+            <li>* La presente cotización de arrendamiento puro es de caracter informativo y de comparación.</li>
+            <li>* Sujeto a aprobación de crédito.</li>
+            <li>* Cotización sujeta a cambios sin previo aviso</li>
+            <li>* En vehículos, alta vehicular y verificación ambiental NO están contemplados en la presente cotización</li>
+            <li>* Valores expresados en pesos mexicanos</li>
+            <li>* KILOMETRAJE ILIMITADO DURANTE EL PLAZO DEL ARRENDAMIENTO</li>
+            <li>* No incluye seguro</li>
+            <li>* El valor factura del vehiculo esta sujeto a la actualizacion de cada marca</li>
+        </ul>
+
+        <div class="signature-section">
+            <p class="label">ATENTAMENTE</p>
+            <p class="name"></p>
+            <div class="signature-line"></div>
+            <p class="label">Asesor de ventas</p>
+        </div>
+    </div>
+	{% if response["tabla_amortizacion"]|length < 57 and response["tabla_amortizacion"]|length != 30 %}
+    <div class="containerff">
+        <div class="left-content">
+            <img src="{{ url_for('static', filename='images/mascota.png') }}" alt="Perro con traje" class="dog-image">
+
+        </div>
+
+        <div class="right-content">
+            <div class="social-title">
+                Síguenos en nuestras redes
+            </div>
+            <div class="social-qrs">
+                <img src="{{ url_for('static', filename='images/qr-code_fb.png') }}" alt="QR Facebook">
+                <img src="{{ url_for('static', filename='images/qr-code_ig.png') }}" alt="QR Instagram">
+                <img src="{{ url_for('static', filename='images/qr-code_ln.png') }}" alt="QR LinkedIn">
+                <img src="{{ url_for('static', filename='images/qr-code_tik.png') }}" alt="QR TikTok">
+                <img src="{{ url_for('static', filename='images/qr-code_wa.png') }}" alt="QR WhatsApp">
+            </div>
+        </div>
+    </div>
+    <div class="btn-container">
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
+    </div>
+	{% endif %}
+<div style="page-break-after: always;"></div>
+		<div class="containerh">
+		    <div class="logo-section">
+				<img src="{{ url_for('static', filename='images/olr-leasing-logo.png') }}" alt="OLR Leasing Logo">
+			</div>
+			<div class="header">
+				<h1>OLR LEASING SAPI DE CV</h1>
+				<h2>Arrendamiento Puro</h2>
+			</div>
+			<div class="date-section">
+				<p>Fecha</p>
+				<p class="fechaActual"></p>
+			</div>
+		</div>		
+	{% endif %}
+		<div>
+			<h5>Tabla de Resumen</h5>
+			<table>
+				<thead>
+					<tr>
+						<th>Concepto</th>
+						<th>Compra</th>
+						<th>Crédito</th>
+						<th>Leasing + Compra</th>
+						<th>Solo Leasing</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for key, value in response["tabla_resumen"].items() %}
+					<tr>
+						{% if key[3:] in ['Rendimiento','Valor Comercial Proyectado','Total Pagado Plan','Beneficio total'] %}
+						{% else %}
+						<td><strong>{{ key[3:] }}</strong></td>
+						<td class="value">{{ "${:,.2f}".format(value.Compra) }}</td>
+						<td class="value">{{ "${:,.2f}".format(value.Credito) }}</td>
+						<td class="value">{{ "${:,.2f}".format(value['Leasing + compra']) }}</td>
+						<td class="value">{{ "${:,.2f}".format(value['Solo Leasing']) }}</td>
+						{% endif %}
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+    <div class="containerf">
+        <ul class="conditions-list">
+            <li>* La presente cotización de arrendamiento puro es de caracter informativo y de comparación.</li>
+            <li>* Sujeto a aprobación de crédito.</li>
+            <li>* Cotización sujeta a cambios sin previo aviso</li>
+            <li>* En vehículos, alta vehicular y verificación ambiental NO están contemplados en la presente cotización</li>
+            <li>* Valores expresados en pesos mexicanos</li>
+            <li>* KILOMETRAJE ILIMITADO DURANTE EL PLAZO DEL ARRENDAMIENTO</li>
+            <li>* No incluye seguro</li>
+            <li>* El valor factura del vehiculo esta sujeto a la actualizacion de cada marca</li>
+        </ul>
+
+        <div class="signature-section">
+            <p class="label">ATENTAMENTE</p>
+            <p class="name"></p>
+            <div class="signature-line"></div>
+            <p class="label">Asesor de ventas</p>
+        </div>
+    </div>
+    <div class="containerff">
+        <div class="left-content">
+            <img src="{{ url_for('static', filename='images/mascota.png') }}" alt="Perro con traje" class="dog-image">
+
+        </div>
+
+        <div class="right-content">
+            <div class="social-title">
+                Síguenos en nuestras redes
+            </div>
+            <div class="social-qrs">
+                <img src="{{ url_for('static', filename='images/qr-code_fb.png') }}" alt="QR Facebook">
+                <img src="{{ url_for('static', filename='images/qr-code_ig.png') }}" alt="QR Instagram">
+                <img src="{{ url_for('static', filename='images/qr-code_ln.png') }}" alt="QR LinkedIn">
+                <img src="{{ url_for('static', filename='images/qr-code_tik.png') }}" alt="QR TikTok">
+                <img src="{{ url_for('static', filename='images/qr-code_wa.png') }}" alt="QR WhatsApp">
+            </div>
+        </div>
+    </div>	
+    <div class="btn-container">
+		<br>
+        <button class="print-button" onclick="savePageAsPdf()"><b>Guardar como PDF</b></button>
+    </div>
+	<script>
+	  // Crea un nuevo objeto Date
+	  const fecha = new Date();
+
+	  // Obtiene la fecha como una cadena de texto legible
+	  const fechaTexto = fecha.toLocaleDateString('es-MX', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	  });
+
+	  // Muestra la fecha en el elemento con id "fechaActual"
+	  const elementosFechaActual = document.querySelectorAll('.fechaActual');
+	  elementosFechaActual.forEach(elemento => {
+		elemento.innerText = fechaTexto;
+	  });
+	</script>
+	<script>
+        function savePageAsPdf() {
+            window.print();
+        }
+    </script>	
+</body>
+</html>
