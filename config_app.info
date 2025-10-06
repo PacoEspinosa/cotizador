@@ -41,48 +41,64 @@
         "E": "Electrico",
         "G": "Gasolina"
     },
-    "catalogo_conceptos_factura": {
-        "g_administracion": {
-            "media": 0.2831,
-            "variacion": 0.0931
-        },
-        "g_arrendamiento": {
-            "media": 0.3115,
-            "variacion": 0.09588
-        },
-        "gps": {
-            "media": 0.1885,
-            "variacion": 0.06391
-        },
-        "instalacion_gps": {
-            "media": 0.0994,
-            "variacion": 0.09195
-        },
-        "alta_vehiculo": {
-            "media": 0.1166,
-            "variacion": 0.07878
-        },
-        "gastos_notariales": {
-            "media": 0.1023,
-            "variacion": 0.07322
-        },
-        "seguro_fac": {
-            "media": 0.2406,
-            "variacion": 0.06816
-        },
-        "telemetria": {
-            "media": 0.1129,
-            "variacion": 0.06195
-        },
-        "gestoria_alta": {
-            "media": 0.087,
-            "variacion": 0.05299
-        },
-        "gestoria_seguro": {
-            "media": 0.0528,
-            "variacion": 0.03344
-        }
+  "catalogo_conceptos_factura": {
+    "g_administracion": {
+      "media": 3,
+      "variacion": 0.0931
     },
+    "g_arrendamiento": {
+      "media": 4,
+      "variacion": 0.09588
+    },
+    "gps": {
+      "media": 2,
+      "variacion": 0.06391
+    },
+    "instalacion_gps": {
+      "media": 1,
+      "variacion": 0.09195
+    },
+    "alta_vehiculo": {
+      "media": 1,
+      "variacion": 0.07878
+    },
+    "gastos_notariales": {
+      "media": 1,
+      "variacion": 0.07322
+    },
+    "seguro_fac": {
+      "media": 3,
+      "variacion": 0.06816
+    },
+    "telemetria": {
+      "media": 1,
+      "variacion": 0.06195
+    },
+    "gestoria_alta": {
+      "media": 1,
+      "variacion": 0.05299
+    },
+    "gestoria_seguro": {
+      "media": 1,
+      "variacion": 0.05299
+    },
+    "paq_proteccion": {
+      "media": 2,
+      "variacion": 0.05299
+    },
+    "km_ilimitado": {
+      "media": 1,
+      "variacion": 0.05299
+    },
+    "rotulaje": {
+      "media": 1,
+      "variacion": 0.05299
+    },
+    "asesoria_legal": {
+      "media": 2,
+      "variacion": 0.03344
+    }
+  },
     "catalogo_valor_residual": {
         "12": {
             "min": 5,
