@@ -237,10 +237,7 @@ def cotizador_optimo():
         otros_gastos = otros_gastos_siva + iva_otros_gastos
         #if (pago_inicial_total-seguro) > (valor_siva*precio_activo) and deposito_garantia == 0:
         if (pago_inicial_total-seguro-deposito_garantia) > (valor_siva*precio_activo):
-            if es_inversion:
-                return jsonify({"error": "El pago inicial genera un valor mayor al permitido y ya se tiene un deposito en inversion."}), 400
-            else:
-                deposito_garantia += (pago_inicial_total-seguro) - (valor_siva*precio_activo)
+            deposito_garantia += (pago_inicial_total-seguro) - (valor_siva*precio_activo)
         valor_inicial_arrenda = pago_inicial_total - seguro - deposito_garantia
         comision_apertura = (valor_factura + accesorios + otros_gastos - valor_inicial_arrenda)*(tasa_comision_apertura/100)
         comision_apertura_siva = comision_apertura/(1+iva)
