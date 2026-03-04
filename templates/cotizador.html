@@ -67,18 +67,8 @@
             <td colspan="2"><input type="number" step="0.01" id="tasa_comision_apertura" name="tasa_comision_apertura" value="{{ input_lines.tasa_comision_apertura }}" required></td>
         </tr>
         <tr>
-            <th rowspan="2">Tasa Interés Anual:</th>
-            <th><label for="tasa_interes_anual">Tasa Interés (%):</label></th>
+            <th colspan="2">Tasa Interés Anual:</th>
 			<td colspan="2"><input type="number" step="0.01" id="tasa_interes_anual" name="tasa_interes_anual" value="{{ input_lines.tasa_interes_anual if api_response else 0 }}" required></td>
-        </tr>
-        <tr>
-            <th><label for="plan_tasa">Plan:</label></th>
-			<td colspan="2"><select name="plan_tasa" id="plan_tasa" >
-			<option value="" >No Seleccionado</option>
-            {% for key, value in tbl_planes.items() %}
-                <option value="{{ key }}" {{ 'Selected' if key == input_lines.plan_tasa else ''}}>{{ key }}</option>
-            {% endfor %}
-			</select></td>
         </tr>
         <tr>
             <th colspan="2"><label for="num_parametros_facturacion">Número Parámetros Facturación:</label></th>

@@ -125,30 +125,30 @@
     }
   },
   "catalogo_tasa_anual": {
-    "A": {
-      "Auto": 32,
-      "Tracto/maquina": 34,
-      "Bicicleta": 45
+    "12": {
+      "Auto": 30.2,
+      "Tracto/maquina": 30.2,
+      "Bicicleta": 30.2
     },
-    "B": {
-      "Auto": 33,
-      "Tracto/maquina": 35,
-      "Bicicleta": 45
+    "24": {
+      "Auto": 26,
+      "Tracto/maquina": 26,
+      "Bicicleta": 26
     },
-    "C": {
-      "Auto": 34,
-      "Tracto/maquina": 36,
-      "Bicicleta": 45
+    "36": {
+      "Auto": 24.55,
+      "Tracto/maquina": 24.55,
+      "Bicicleta": 24.55
     },
-    "D": {
-      "Auto": 35,
-      "Tracto/maquina": 37,
-      "Bicicleta": 45
+    "48": {
+      "Auto": 23.82,
+      "Tracto/maquina": 23.82,
+      "Bicicleta": 23.82
     },
-    "E": {
-      "Auto": 36,
-      "Tracto/maquina": 38,
-      "Bicicleta": 45
+    "60": {
+      "Auto": 23.82,
+      "Tracto/maquina": 23.82,
+      "Bicicleta": 23.82
     }
   }
 }

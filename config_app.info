@@ -122,27 +122,27 @@
         }
     },
     "catalogo_tasa_anual": {
-        "A": {
+        "12": {
             "Auto": 32,
             "Tracto/maquina": 34,
             "Bicicleta": 45
         },
-        "B": {
+        "24": {
             "Auto": 33,
             "Tracto/maquina": 35,
             "Bicicleta": 45
         },
-        "C": {
+        "36": {
             "Auto": 34,
             "Tracto/maquina": 36,
             "Bicicleta": 45
         },
-        "D": {
+        "48": {
             "Auto": 35,
             "Tracto/maquina": 37,
             "Bicicleta": 45
         },
-        "E": {
+        "60": {
             "Auto": 36,
             "Tracto/maquina": 38,
             "Bicicleta": 45

@@ -192,14 +192,26 @@ def cotizador_optimo():
         cat_otros_gastos = config['catalogo_otros_gastos']
         cat_valor_residual = config['catalogo_valor_residual']
         
-        if plan_tasa not in config["catalogo_tasa_anual"]:
+        if plazo_meses < 12:
+            plan_tasa = ''
+        elif plazo_meses < 24:
+            plan_tasa = "12"
+        elif plazo_meses < 36:
+            plan_tasa = "24"
+        elif plazo_meses < 48:
+            plan_tasa = "36"
+        elif plazo_meses < 60:
+            plan_tasa = "48"
+        else:
+            plan_tasa = "60"
+            
+        
+        if (plan_tasa == '' and tasa_interes_anual == 0):
+            return jsonify({"error": "Debes proporcionar la tasa de interes anual."}), 400
+        elif plan_tasa not in config["catalogo_tasa_anual"]:
             if plan_tasa != '':
                 return jsonify({"error": "plan_tasa:Valor fuera de catalogo."}), 400
-        if (plan_tasa != '' and tasa_interes_anual > 0):
-            return jsonify({"error": "Solo debes proporcionar uno de los dos, Plan del leasing o la tasa de interes anual."}), 400
-        elif (plan_tasa == '' and tasa_interes_anual == 0):
-            return jsonify({"error": "Debes proporcionar alguno de los dos, Plan del leasing o la tasa de interes anual."}), 400
-        elif plan_tasa != '':
+        elif (plan_tasa != '' and tasa_interes_anual == 0):
             tasa_interes_anual = config["catalogo_tasa_anual"][plan_tasa][tipo_activo]
 
         if tasa_comision_apertura <= tasa_comision_min or tasa_comision_apertura > tasa_comision_max:
@@ -649,13 +661,14 @@ def cotizador_optimo():
 
 
             
-        if tipo_respuesta == 1:
+        if tipo_respuesta == 1: #tabla amortizacion
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),
+                "tasa_interes_anual": round(tasa_interes_anual, 2),
                 "tabla_amortizacion": tabla_amortizacion
             }
-        elif tipo_respuesta == 2:
+        elif tipo_respuesta == 2: #tabla resumen
             response = {
                 "renta_mensual_calculada": round(renta_mensual_calculada, 2),
                 "pago_credito_calculada": round(pago_credito, 2),
@@ -688,6 +701,7 @@ def cotizador_optimo():
                 "descuento_mensual": round(descuento_mensual, 2),
                 "fondo_reserva": round(fondo_reserva, 2),
                 "renta_mensual_descuento": round(renta_mensual_descuento, 2),
+                "tasa_interes_anual": round(tasa_interes_anual, 2),
                 "renta_mensual_facturada": round(renta_mensual_facturada, 2),
                 "pago_credito_calculada": round(pago_credito, 2),
                 "tir": round(tir*100,2),

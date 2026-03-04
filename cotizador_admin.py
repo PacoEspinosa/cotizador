@@ -240,10 +240,11 @@ def cotizador():
             tipo_vehiculo = request.form.get('tipo_vehiculo', 'G')
             tasa_comision_apertura = float(request.form.get('tasa_comision_apertura', 1))
             tasa_interes_anual = float(request.form.get('tasa_interes_anual', 0))
-            plan_tasa = request.form.get('plan_tasa')
             num_parametros_facturacion = int(request.form.get('num_parametros_facturacion', 10))
             tipo_respuesta = int(6)
             fuente_consulta = 1
+
+            #plan_tasa = request.form.get('plan_tasa')
             
             payload = {
                 "valor_factura": valor_factura,
@@ -259,7 +260,7 @@ def cotizador():
                 "tipo_vehiculo": tipo_vehiculo,
                 "tasa_comision_apertura": tasa_comision_apertura,
                 "tasa_interes_anual": tasa_interes_anual,
-                "plan_tasa": plan_tasa,
+                "plan_tasa": 0,
                 "num_parametros_facturacion": num_parametros_facturacion,
                 "tipo_respuesta": tipo_respuesta,
                 "fuente_consulta": fuente_consulta
@@ -301,6 +302,7 @@ def cotizador():
             else:
                 api_response = response.json()
                 session["api_response"] = api_response
+                payload["tasa_interes_anual"] = api_response["tasa_interes_anual"]
                 if 'admin_message' in api_response:
                     flash(api_response['admin_message'], 'success')
                 
